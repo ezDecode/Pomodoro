@@ -103,8 +103,8 @@ export function Statistics({ settings, onDeleteSession, onRenameSession }) {
           {isHistoryOpen && recentHistory.length > 0 && (
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {recentHistory.map((session, index) => (
-                <div key={index} className="flex justify-between items-center p-3 border-2 border-black bg-gray-100 gap-3">
-                  <div className="flex-1 flex items-center gap-2">
+                <div key={index} className="flex flex-col sm:flex-row sm:items-center p-3 border-2 border-black bg-gray-100 gap-2 sm:gap-3">
+                  <div className="flex-1 flex items-center gap-2 min-w-0">
                     {editingSession === index ? (
                       <input
                         type="text"
@@ -114,27 +114,27 @@ export function Statistics({ settings, onDeleteSession, onRenameSession }) {
                           if (e.key === 'Enter') handleRenameSubmit()
                           if (e.key === 'Escape') handleRenameCancel()
                         }}
-                        className="input-brutal text-sm flex-1"
+                        className="input-brutal text-sm flex-1 min-w-0"
                         autoFocus
                       />
                     ) : (
-                      <span className="font-normal text-sm capitalize tracking-tight">{session.type}</span>
+                      <span className="font-normal text-sm capitalize tracking-tight truncate">{session.type}</span>
                     )}
-                    <span className="font-normal text-sm tracking-tight text-gray-600">{formatTime(session.duration)}</span>
+                    <span className="font-normal text-sm tracking-tight text-gray-600 whitespace-nowrap">{formatTime(session.duration)}</span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 shrink-0 justify-end sm:justify-start">
                     {editingSession === index ? (
                       <>
                         <button
                           onClick={handleRenameSubmit}
-                          className="btn-brutal btn-success btn-icon-only"
+                          className="btn-brutal btn-success btn-sm px-2 py-1 text-sm min-w-0"
                           title="Save"
                         >
                           ✓
                         </button>
                         <button
                           onClick={handleRenameCancel}
-                          className="btn-brutal btn-neutral btn-icon-only"
+                          className="btn-brutal btn-neutral btn-sm px-2 py-1 text-sm min-w-0"
                           title="Cancel"
                         >
                           ✕
@@ -144,14 +144,14 @@ export function Statistics({ settings, onDeleteSession, onRenameSession }) {
                       <>
                         <button
                           onClick={() => handleRenameStart(session, index)}
-                          className="btn-brutal btn-neutral btn-icon-only"
+                          className="btn-brutal btn-neutral btn-sm px-2 py-1 text-sm min-w-0"
                           title="Rename session"
                         >
                           <Edit3 size={12} />
                         </button>
                         <button
                           onClick={() => handleDeleteSession(index)}
-                          className="btn-brutal btn-danger btn-icon-only"
+                          className="btn-brutal btn-danger btn-sm px-2 py-1 text-sm min-w-0"
                           title="Delete session"
                         >
                           <Trash2 size={12} />

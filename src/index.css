@@ -294,4 +294,21 @@ body {
     font-size: 0.875rem;
     min-width: auto;
   }
+
+  /* Improved rename input responsiveness */
+  .input-brutal {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* Better button spacing in rename mode */
+  .btn-sm {
+    min-height: 2rem;
+    font-size: 0.75rem;
+  }
+
+  /* Ensure flex containers don't overflow */
+  .flex-1 {
+    min-width: 0;
+  }
 }
