@@ -10,7 +10,6 @@ export const DEFAULT_SETTINGS = {
   preset: DEFAULT_PRESET,
   autoStartNext: true,
   delayNext: 0,
-  volume: 0.5,
   completedSessions: 0,
   totalWorkTime: 0,
   totalBreakTime: 0,
