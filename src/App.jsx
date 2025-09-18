@@ -51,11 +51,19 @@ function App() {
   }
 
   const handleToggleStats = () => {
-    setShowStats((prev) => !prev)
+    setShowStats((prev) => {
+      const next = !prev
+      if (next) setShowSettings(false)
+      return next
+    })
   }
 
   const handleToggleSettings = () => {
-    setShowSettings((prev) => !prev)
+    setShowSettings((prev) => {
+      const next = !prev
+      if (next) setShowStats(false)
+      return next
+    })
   }
 
   const handleTogglePresets = () => {
