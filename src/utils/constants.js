@@ -22,4 +22,4 @@ export const PRESETS = [
   { name: '50/10/20', work: 3000, shortBreak: 600, longBreak: 1200, cycle: 3 },
 ]
 
-export const STORAGE_KEY = 'pomodoro-settings'
+export const STORAGE_KEY = 'timer-Settings'
