@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { X, CheckCircle } from 'lucide-react'
-import { formatTime, stopNotificationBeep } from '../utils/helpers'
+import { formatTime } from '../utils/helpers'
 
 export function CompletionModal({ 
   isOpen, 
@@ -8,12 +8,10 @@ export function CompletionModal({
   sessionData,
   totalStats
 }) {
-  // Ensure any ongoing beep is stopped when modal closes/unmounts
+  // Modal lifecycle cleanup
   useEffect(() => {
     if (!isOpen) return
-    return () => {
-      stopNotificationBeep()
-    }
+    return () => {}
   }, [isOpen])
 
   if (!isOpen) return null
@@ -25,7 +23,7 @@ export function CompletionModal({
       {/* Overlay */}
       <div 
         className="absolute inset-0 backdrop-blur-sm"
-        onClick={() => { stopNotificationBeep(); onClose() }}
+        onClick={onClose}
       />
       
       {/* Modal Content */}
@@ -36,7 +34,7 @@ export function CompletionModal({
             <h2 className="text-2xl font-normal">Session Complete!</h2>
           </div>
           <button
-            onClick={() => { stopNotificationBeep(); onClose() }}
+            onClick={onClose}
             className="btn-brutal btn-icon-only"
             title="Close"
           >
