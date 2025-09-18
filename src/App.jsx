@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Play, Pause, RotateCcw, SkipForward, Settings, BarChart3, Download, Upload } from 'lucide-react'
+import { Play, Pause, RotateCcw, SkipForward, Settings, BarChart3, Download, Upload, Plus, Edit3, Trash2, Save, X } from 'lucide-react'
 
 const defaultPreset = {
   name: '25/5/15',
@@ -11,6 +11,11 @@ const defaultPreset = {
 
 const defaultSettings = {
   preset: defaultPreset,
+  presets: [
+    { id: '1', name: '25/5/15', work: 25 * 60, shortBreak: 5 * 60, longBreak: 15 * 60, cycle: 4 },
+    { id: '2', name: '50/10/20', work: 50 * 60, shortBreak: 10 * 60, longBreak: 20 * 60, cycle: 3 },
+    { id: '3', name: '90/20/30', work: 90 * 60, shortBreak: 20 * 60, longBreak: 30 * 60, cycle: 2 }
+  ],
   autoStartNext: true,
   delayNext: 0,
   volume: 0.5,
@@ -28,6 +33,31 @@ function formatTime(totalSeconds) {
   return `${hh}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
+function PomodoroLogo({ className = "w-12 h-12" }) {
+  return (
+    <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Tomato body */}
+      <circle cx="50" cy="60" r="35" fill="#ef4444" stroke="#000" strokeWidth="2"/>
+      {/* Tomato top */}
+      <path d="M35 25 Q50 15 65 25 L60 35 Q50 30 40 35 Z" fill="#22c55e" stroke="#000" strokeWidth="2"/>
+      {/* Tomato stem */}
+      <rect x="48" y="20" width="4" height="8" fill="#16a34a" stroke="#000" strokeWidth="1"/>
+      {/* Timer face */}
+      <circle cx="50" cy="60" r="25" fill="#fff" stroke="#000" strokeWidth="2"/>
+      {/* Clock hands */}
+      <line x1="50" y1="60" x2="50" y2="45" stroke="#000" strokeWidth="2" strokeLinecap="round"/>
+      <line x1="50" y1="60" x2="60" y2="60" stroke="#000" strokeWidth="1.5" strokeLinecap="round"/>
+      {/* Center dot */}
+      <circle cx="50" cy="60" r="3" fill="#000"/>
+      {/* Clock numbers */}
+      <text x="50" y="40" textAnchor="middle" fontSize="8" fill="#000" fontWeight="bold">12</text>
+      <text x="70" y="65" textAnchor="middle" fontSize="8" fill="#000" fontWeight="bold">3</text>
+      <text x="50" y="85" textAnchor="middle" fontSize="8" fill="#000" fontWeight="bold">6</text>
+      <text x="30" y="65" textAnchor="middle" fontSize="8" fill="#000" fontWeight="bold">9</text>
+    </svg>
+  )
+}
+
 function App() {
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('pomodoro-settings')
@@ -38,8 +68,11 @@ function App() {
   const [isRunning, setIsRunning] = useState(false)
   const [showStats, setShowStats] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showPresetManager, setShowPresetManager] = useState(false)
+  const [editingPreset, setEditingPreset] = useState(null)
+  const [newPreset, setNewPreset] = useState({ name: '', work: 25, shortBreak: 5, longBreak: 15, cycle: 4 })
 
-  const { preset, autoStartNext, delayNext, volume, completedSessions, totalWorkTime, totalBreakTime, sessionHistory } = settings
+  const { preset, presets, autoStartNext, delayNext, volume, completedSessions, totalWorkTime, totalBreakTime, sessionHistory } = settings
 
   const isWork = sessionIndex % 2 === 0
   const isLongBreak = !isWork && ((sessionIndex + 1) % (preset.cycle * 2) === 0)
@@ -165,6 +198,58 @@ function App() {
     }
   }
 
+  const addPreset = () => {
+    if (!newPreset.name.trim()) {
+      alert('Please enter a preset name')
+      return
+    }
+    
+    const presetData = {
+      id: Date.now().toString(),
+      name: newPreset.name.trim(),
+      work: newPreset.work * 60,
+      shortBreak: newPreset.shortBreak * 60,
+      longBreak: newPreset.longBreak * 60,
+      cycle: newPreset.cycle
+    }
+    
+    setSettings(prev => ({
+      ...prev,
+      presets: [...prev.presets, presetData]
+    }))
+    
+    setNewPreset({ name: '', work: 25, shortBreak: 5, longBreak: 15, cycle: 4 })
+  }
+
+  const updatePreset = (id, updatedPreset) => {
+    setSettings(prev => ({
+      ...prev,
+      presets: prev.presets.map(p => p.id === id ? { ...p, ...updatedPreset } : p)
+    }))
+    setEditingPreset(null)
+  }
+
+  const deletePreset = (id) => {
+    if (presets.length <= 1) {
+      alert('Cannot delete the last preset')
+      return
+    }
+    
+    setSettings(prev => ({
+      ...prev,
+      presets: prev.presets.filter(p => p.id !== id),
+      preset: prev.preset.id === id ? prev.presets[0] : prev.preset
+    }))
+  }
+
+  const selectPreset = (presetData) => {
+    setSettings(prev => ({
+      ...prev,
+      preset: presetData
+    }))
+    setShowPresetManager(false)
+  }
+
   return (
     <div className="min-h-screen w-full bg-white relative text-gray-800 p-4">
       {/* Crosshatch Art - Light Pattern */}
@@ -183,9 +268,12 @@ function App() {
       {/* Header */}
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="flex items-center justify-between mb-8">
-      <div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight">Pomodoro</h1>
-            <p className="text-base sm:text-lg md:text-xl font-normal">Ultra-flexible timer</p>
+          <div className="flex items-center gap-4">
+            <PomodoroLogo className="w-16 h-16" />
+            <div>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight">Pomodoro</h1>
+              <p className="text-base sm:text-lg md:text-xl font-normal">Ultra-flexible timer</p>
+            </div>
           </div>
           <div className="flex gap-4">
             <button 
@@ -193,7 +281,10 @@ function App() {
               onClick={() => {
                 setShowStats((prev) => {
                   const next = !prev
-                  if (next) setShowSettings(false)
+                  if (next) {
+                    setShowSettings(false)
+                    setShowPresetManager(false)
+                  }
                   return next
                 })
               }}
@@ -203,11 +294,31 @@ function App() {
               <span className="hide-text-mobile">Stats</span>
             </button>
             <button 
+              className="btn-brutal btn-success flex items-center gap-2 sm:gap-2 btn-icon-only"
+              onClick={() => {
+                setShowPresetManager((prev) => {
+                  const next = !prev
+                  if (next) {
+                    setShowStats(false)
+                    setShowSettings(false)
+                  }
+                  return next
+                })
+              }}
+              title="Manage Presets"
+            >
+              <Plus size={20} />
+              <span className="hide-text-mobile">Presets</span>
+            </button>
+            <button 
               className="btn-brutal btn-secondary flex items-center gap-2 sm:gap-2 btn-icon-only"
               onClick={() => {
                 setShowSettings((prev) => {
                   const next = !prev
-                  if (next) setShowStats(false)
+                  if (next) {
+                    setShowStats(false)
+                    setShowPresetManager(false)
+                  }
                   return next
                 })
               }}
@@ -278,24 +389,17 @@ function App() {
 
               {/* Presets */}
               <div className="flex flex-wrap justify-center gap-4">
-                <button 
-                  className="btn-brutal btn-success preset-compact"
-                  onClick={() => setSettings(prev => ({ ...prev, preset: {name:'25/5/15',work:1500,shortBreak:300,longBreak:900,cycle:4} }))}
-                >
-                  25/5/15
-                </button>
-                <button 
-                  className="btn-brutal btn-success preset-compact"
-                  onClick={() => setSettings(prev => ({ ...prev, preset: {name:'50/10/20',work:3000,shortBreak:600,longBreak:1200,cycle:3} }))}
-                >
-                  50/10/20
-                </button>
-                <button 
-                  className="btn-brutal btn-success preset-compact"
-                  onClick={() => setSettings(prev => ({ ...prev, preset: {name:'90/20/30',work:5400,shortBreak:1200,longBreak:1800,cycle:2} }))}
-                >
-                  90/20/30
-                </button>
+                {presets.map((presetData) => (
+                  <button 
+                    key={presetData.id}
+                    className={`btn-brutal preset-compact ${
+                      preset.id === presetData.id ? 'btn-primary' : 'btn-success'
+                    }`}
+                    onClick={() => selectPreset(presetData)}
+                  >
+                    {presetData.name}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -463,6 +567,212 @@ function App() {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Preset Manager Panel */}
+          {showPresetManager && (
+            <div className="card-brutal">
+              <h2 className="text-2xl font-normal mb-6">Manage Presets</h2>
+              
+              <div className="space-y-6">
+                {/* Add New Preset */}
+                <div className="border-2 border-black p-4 bg-gray-50">
+                  <h3 className="text-lg font-normal mb-4">Add New Preset</h3>
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <label className="flex flex-col gap-2">
+                      <span className="font-normal">Name</span>
+                      <input 
+                        className="input-brutal" 
+                        type="text" 
+                        value={newPreset.name}
+                        onChange={(e) => setNewPreset(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="e.g., My Custom"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-normal">Work (min)</span>
+                      <input 
+                        className="input-brutal" 
+                        type="number" 
+                        min={1} 
+                        max={999} 
+                        value={newPreset.work}
+                        onChange={(e) => setNewPreset(prev => ({ ...prev, work: Math.max(1, Number(e.target.value)) }))}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-normal">Short break (min)</span>
+                      <input 
+                        className="input-brutal" 
+                        type="number" 
+                        min={1} 
+                        max={999} 
+                        value={newPreset.shortBreak}
+                        onChange={(e) => setNewPreset(prev => ({ ...prev, shortBreak: Math.max(1, Number(e.target.value)) }))}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-normal">Long break (min)</span>
+                      <input 
+                        className="input-brutal" 
+                        type="number" 
+                        min={1} 
+                        max={999} 
+                        value={newPreset.longBreak}
+                        onChange={(e) => setNewPreset(prev => ({ ...prev, longBreak: Math.max(1, Number(e.target.value)) }))}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-normal">Cycle (sessions)</span>
+                      <input 
+                        className="input-brutal" 
+                        type="number" 
+                        min={1} 
+                        max={99} 
+                        value={newPreset.cycle}
+                        onChange={(e) => setNewPreset(prev => ({ ...prev, cycle: Math.max(1, Number(e.target.value)) }))}
+                      />
+                    </label>
+                    <div className="flex items-end">
+                      <button 
+                        className="btn-brutal btn-success flex items-center gap-2"
+                        onClick={addPreset}
+                      >
+                        <Plus size={16} />
+                        Add Preset
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Existing Presets */}
+                <div>
+                  <h3 className="text-lg font-normal mb-4">Existing Presets</h3>
+                  <div className="space-y-3">
+                    {presets.map((presetData) => (
+                      <div key={presetData.id} className="flex items-center justify-between p-3 border-2 border-black bg-white">
+                        <div className="flex-1">
+                          <div className="font-normal text-lg">{presetData.name}</div>
+                          <div className="text-sm text-gray-600">
+                            {Math.floor(presetData.work/60)}min work, {Math.floor(presetData.shortBreak/60)}min short, {Math.floor(presetData.longBreak/60)}min long, {presetData.cycle} cycles
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button 
+                            className="btn-brutal btn-secondary flex items-center gap-1 px-3 py-1 text-sm"
+                            onClick={() => setEditingPreset(presetData)}
+                            title="Edit preset"
+                          >
+                            <Edit3 size={14} />
+                          </button>
+                          <button 
+                            className="btn-brutal flex items-center gap-1 px-3 py-1 text-sm"
+                            onClick={() => deletePreset(presetData.id)}
+                            title="Delete preset"
+                            disabled={presets.length <= 1}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Edit Preset Modal */}
+          {editingPreset && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="card-brutal max-w-md w-full">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-normal">Edit Preset</h3>
+                  <button 
+                    className="btn-brutal btn-secondary flex items-center gap-1 px-3 py-1"
+                    onClick={() => setEditingPreset(null)}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  <label className="flex flex-col gap-2">
+                    <span className="font-normal">Name</span>
+                    <input 
+                      className="input-brutal" 
+                      type="text" 
+                      value={editingPreset.name}
+                      onChange={(e) => setEditingPreset(prev => ({ ...prev, name: e.target.value }))}
+                    />
+                  </label>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <label className="flex flex-col gap-2">
+                      <span className="font-normal">Work (min)</span>
+                      <input 
+                        className="input-brutal" 
+                        type="number" 
+                        min={1} 
+                        max={999} 
+                        value={Math.floor(editingPreset.work/60)}
+                        onChange={(e) => setEditingPreset(prev => ({ ...prev, work: Math.max(1, Number(e.target.value)) * 60 }))}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-normal">Short break (min)</span>
+                      <input 
+                        className="input-brutal" 
+                        type="number" 
+                        min={1} 
+                        max={999} 
+                        value={Math.floor(editingPreset.shortBreak/60)}
+                        onChange={(e) => setEditingPreset(prev => ({ ...prev, shortBreak: Math.max(1, Number(e.target.value)) * 60 }))}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-normal">Long break (min)</span>
+                      <input 
+                        className="input-brutal" 
+                        type="number" 
+                        min={1} 
+                        max={999} 
+                        value={Math.floor(editingPreset.longBreak/60)}
+                        onChange={(e) => setEditingPreset(prev => ({ ...prev, longBreak: Math.max(1, Number(e.target.value)) * 60 }))}
+                      />
+                    </label>
+                    <label className="flex flex-col gap-2">
+                      <span className="font-normal">Cycle (sessions)</span>
+                      <input 
+                        className="input-brutal" 
+                        type="number" 
+                        min={1} 
+                        max={99} 
+                        value={editingPreset.cycle}
+                        onChange={(e) => setEditingPreset(prev => ({ ...prev, cycle: Math.max(1, Number(e.target.value)) }))}
+                      />
+                    </label>
+                  </div>
+                  
+                  <div className="flex gap-4">
+                    <button 
+                      className="btn-brutal btn-success flex items-center gap-2 flex-1"
+                      onClick={() => updatePreset(editingPreset.id, editingPreset)}
+                    >
+                      <Save size={16} />
+                      Save Changes
+                    </button>
+                    <button 
+                      className="btn-brutal btn-secondary flex items-center gap-2 flex-1"
+                      onClick={() => setEditingPreset(null)}
+                    >
+                      <X size={16} />
+                      Cancel
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
