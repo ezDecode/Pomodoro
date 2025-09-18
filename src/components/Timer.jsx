@@ -2,6 +2,7 @@ import { formatTime, calculateTotalCycleSeconds, getSessionInfo } from '../utils
 import { ProgressBar } from './ProgressBar'
 import { TimerControls } from './TimerControls'
 import { PresetButtons } from './PresetButtons'
+import { CompactSettings } from './CompactSettings'
 
 export function Timer({ 
   sessionIndex,
@@ -13,14 +14,16 @@ export function Timer({
   onPause,
   onReset,
   onSkip,
-  onPresetSelect
+  onPresetSelect,
+  onSettingsUpdate,
+  onImportSettings
 }) {
   const { preset } = settings
   const { sessionLabel } = getSessionInfo(sessionIndex, preset)
   const totalCycleSeconds = calculateTotalCycleSeconds(preset)
 
   return (
-    <div className="lg:col-span-3">
+    <div className="lg:col-span-1">
       <div className="card-brutal text-center">
         <div className="mb-8">
           <div className="text-lg sm:text-xl font-normal mb-4">{sessionLabel}</div>
@@ -42,9 +45,13 @@ export function Timer({
           onSkip={onSkip}
         />
 
-        <div className="mt-6">
-          <PresetButtons onPresetSelect={onPresetSelect} />
-        </div>
+        <PresetButtons onPresetSelect={onPresetSelect} />
+        
+        <CompactSettings 
+          settings={settings}
+          onSettingsUpdate={onSettingsUpdate}
+          onImportSettings={onImportSettings}
+        />
       </div>
     </div>
   )

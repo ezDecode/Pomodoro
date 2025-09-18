@@ -6,7 +6,6 @@ import { useTimer } from './hooks/useTimer'
 function App() {
   const [sessionIndex, setSessionIndex] = useState(0)
   const [showStats, setShowStats] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
 
   const { 
     settings, 
@@ -41,20 +40,9 @@ function App() {
   }
 
   const handleToggleStats = () => {
-    setShowStats((prev) => {
-      const next = !prev
-      if (next) setShowSettings(false)
-      return next
-    })
+    setShowStats((prev) => !prev)
   }
 
-  const handleToggleSettings = () => {
-    setShowSettings((prev) => {
-      const next = !prev
-      if (next) setShowStats(false)
-      return next
-    })
-  }
 
   return (
     <div className="min-h-screen w-full bg-white relative text-gray-800 p-4">
@@ -75,12 +63,10 @@ function App() {
       <div className="max-w-6xl mx-auto relative z-10">
         <Header
           showStats={showStats}
-          showSettings={showSettings}
           onToggleStats={handleToggleStats}
-          onToggleSettings={handleToggleSettings}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className={`grid grid-cols-1 gap-8 ${showStats ? 'lg:grid-cols-2' : ''}`}>
           <Timer
             sessionIndex={sessionIndex}
             remaining={remaining}
@@ -92,22 +78,12 @@ function App() {
             onReset={resetTimer}
             onSkip={handleSkip}
             onPresetSelect={updatePreset}
+            onSettingsUpdate={updateSettings}
+            onImportSettings={importSettings}
           />
 
-          {showSettings && (
-            <div className="lg:col-span-2">
-              <Settings
-                settings={settings}
-                onSettingsUpdate={updateSettings}
-                onImportSettings={importSettings}
-              />
-            </div>
-          )}
-
           {showStats && (
-            <div className="lg:col-span-2">
-              <Statistics settings={settings} />
-            </div>
+            <Statistics settings={settings} />
           )}
         </div>
       </div>

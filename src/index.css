@@ -80,7 +80,7 @@ body {
 }
 
 /* Neo-brutalist timer display */
-.timer-display {}
+/* .timer-display {} */
 
 /* Neo-brutalist progress bar */
 .progress-brutal {
@@ -118,9 +118,6 @@ body {
     min-width: auto;
   }
 }
-<<<<<<< Current (Your changes)
-=======
-
 /* Preset button styling for all screen sizes */
 .preset-compact {
   @apply px-4 py-2 text-base min-w-max;
@@ -133,4 +130,4 @@ body {
     min-width: auto;
   }
 }
->>>>>>> Incoming (Background Agent changes)
+
