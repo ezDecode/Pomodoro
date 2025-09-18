@@ -8,7 +8,7 @@ export function Header({
     <div className="flex items-center justify-between mb-8">
       <div>
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight">Pomodoro</h1>
-        <p className="text-base sm:text-lg md:text-xl font-normal">Ultra-flexible timer</p>
+        <p className="text-base sm:text-lg md:text-xl font-normal tracking-tight">Ultra-flexible timer</p>
       </div>
       <div className="flex gap-4">
         <button 

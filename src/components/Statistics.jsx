@@ -17,7 +17,7 @@ export function Statistics({ settings }) {
   return (
     <div className="card-brutal">
       <div className="mb-4">
-        <h2 className="text-2xl font-normal">Statistics</h2>
+        <h2 className="text-2xl font-normal tracking-tight">Statistics</h2>
       </div>
       
       <div className="space-y-6">
@@ -28,7 +28,7 @@ export function Statistics({ settings }) {
             onClick={() => setIsSummaryOpen(v => !v)}
             title="Toggle summary"
           >
-            <h3 className="text-base font-medium">Summary</h3>
+            <h3 className="text-base font-normal tracking-tight">Summary</h3>
             {isSummaryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
           {isSummaryOpen && (
@@ -36,20 +36,20 @@ export function Statistics({ settings }) {
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
                   <div className="text-3xl font-light text-green-500">{completedSessions}</div>
-                  <div className="text-sm font-normal">Sessions</div>
+                  <div className="text-sm font-normal tracking-tight">Sessions</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-light text-blue-500">{formatTime(totalWorkTime)}</div>
-                  <div className="text-sm font-normal">Work time</div>
+                  <div className="text-sm font-normal tracking-tight">Work time</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-light text-red-500">{pauseCount || 0}</div>
-                  <div className="text-sm font-normal">Pauses</div>
+                  <div className="text-sm font-normal tracking-tight">Pauses</div>
                 </div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-light text-orange-500">{formatTime(totalBreakTime)}</div>
-                <div className="text-sm font-normal">Pause time</div>
+                <div className="text-sm font-normal tracking-tight">Pause time</div>
               </div>
             </div>
           )}
@@ -63,7 +63,7 @@ export function Statistics({ settings }) {
               onClick={() => setIsHistoryOpen(v => !v)}
               title="Toggle history"
             >
-              <h3 className="text-base font-medium">Recent sessions</h3>
+              <h3 className="text-base font-normal tracking-tight">Recent sessions</h3>
               {isHistoryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
           </div>
@@ -72,14 +72,14 @@ export function Statistics({ settings }) {
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {recentHistory.map((session, index) => (
                 <div key={index} className="flex justify-between items-center p-2 border-2 border-black bg-gray-100">
-                  <span className="font-normal text-sm capitalize">{session.type}</span>
-                  <span className="font-normal text-sm">{formatTime(session.duration)}</span>
+                  <span className="font-normal text-sm capitalize tracking-tight">{session.type}</span>
+                  <span className="font-normal text-sm tracking-tight">{formatTime(session.duration)}</span>
                 </div>
               ))}
             </div>
           )}
           {isHistoryOpen && recentHistory.length === 0 && (
-            <div className="text-sm text-gray-500">No sessions yet.</div>
+            <div className="text-sm text-gray-500 tracking-tight">No sessions yet.</div>
           )}
         </section>
       </div>

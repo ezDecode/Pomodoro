@@ -98,7 +98,7 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
               {customPresets.map((preset) => (
                 <div key={preset.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div>
-                    <div className="font-medium">{preset.name}</div>
+                    <div className="font-normal">{preset.name}</div>
                     <div className="text-sm text-gray-600">
                       {Math.floor(preset.work/60)}/{Math.floor(preset.shortBreak/60)}/{Math.floor(preset.longBreak/60)} - {preset.cycle} cycles
                     </div>

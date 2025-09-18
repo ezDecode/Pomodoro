@@ -44,7 +44,7 @@ export function CompletionModal({
 
         {/* Session Details */}
         <div className="mb-8">
-          <h3 className="text-lg font-medium mb-4">This Session:</h3>
+          <h3 className="text-lg font-normal mb-4">This Session:</h3>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
               <div className="text-3xl font-light text-blue-500">{formatTime(sessionData.duration)}</div>
@@ -59,7 +59,7 @@ export function CompletionModal({
 
         {/* Overall Statistics */}
         <div className="mb-8">
-          <h3 className="text-lg font-medium mb-4">Overall Statistics:</h3>
+          <h3 className="text-lg font-normal mb-4">Overall Statistics:</h3>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="text-center">
               <div className="text-3xl font-light text-green-500">{completedSessions}</div>

@@ -127,7 +127,7 @@ export function Timer({
     <div className="lg:col-span-1">
       <div className="card-brutal text-center">
         <div className="mb-8">
-          <div className="text-lg sm:text-xl font-normal mb-4">{sessionLabel}</div>
+          <div className="text-lg sm:text-xl font-normal mb-4 tracking-tight">{sessionLabel}</div>
           <div 
             className="timer-display mb-4 text-6xl sm:text-7xl md:text-8xl font-light tracking-tight cursor-pointer hover:bg-gray-50 transition-colors rounded-lg p-2"
             onClick={handleTimerClick}
@@ -194,14 +194,14 @@ export function Timer({
                 </button>
               </div>
               {adjustmentFeedback && (
-                <div className="text-sm text-orange-600 font-medium">
+                <div className="text-sm text-orange-600 font-normal">
                   {adjustmentFeedback}
                 </div>
               )}
             </div>
           )}
           
-          <div className="text-base sm:text-lg font-normal space-y-3">
+          <div className="text-base sm:text-lg font-normal space-y-3 tracking-tight">
             <div className="flex items-center justify-center gap-6">
               <span>Cycle total: {formatTime(totalCycleSeconds)}</span>
               <label className="flex items-center gap-2 cursor-pointer">
@@ -216,15 +216,15 @@ export function Timer({
             </div>
             {!isRunning && breakTime > 0 && (
               <div className="text-center">
-                <div className="text-sm text-orange-600">
-                  Break time this session: <span className="font-medium">{formatTime(breakTime)}</span>
+                <div className="text-sm text-orange-600 tracking-tight">
+                  Break time this session: <span className="font-normal">{formatTime(breakTime)}</span>
                 </div>
               </div>
             )}
             {carryoverBreakTime > 0 && (
               <div className="text-center">
-                <div className="text-sm text-purple-600">
-                  + Carryover from previous session: <span className="font-medium">{formatTime(carryoverBreakTime)}</span>
+                <div className="text-sm text-purple-600 tracking-tight">
+                  + Carryover from previous session: <span className="font-normal">{formatTime(carryoverBreakTime)}</span>
                 </div>
               </div>
             )}

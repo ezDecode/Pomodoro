@@ -27,7 +27,7 @@ export function CompactSettings({
         title={isExpanded ? "Hide settings" : "Show settings"}
       >
         <Settings size={16} />
-        <span className="text-sm font-medium">Quick Settings</span>
+        <span className="text-sm font-normal">Quick Settings</span>
         {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </button>
 
@@ -36,7 +36,7 @@ export function CompactSettings({
         <div className="mt-4 space-y-4 bg-gray-50 rounded-lg p-4">
           {/* Timer Configuration */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Timer Settings</h3>
+            <h3 className="text-sm font-normal text-gray-700 mb-3">Timer Settings</h3>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1">
                 <span className="text-xs text-gray-600">Work (min)</span>
@@ -95,7 +95,7 @@ export function CompactSettings({
 
           {/* Behavior Settings */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Behavior</h3>
+            <h3 className="text-sm font-normal text-gray-700 mb-3">Behavior</h3>
             <div className="space-y-3">
               <label className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Auto-start next session</span>
@@ -125,7 +125,7 @@ export function CompactSettings({
 
           {/* Import/Export */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Data</h3>
+            <h3 className="text-sm font-normal text-gray-700 mb-3">Data</h3>
             <div className="flex gap-2">
               <button 
                 className="btn-brutal btn-success flex items-center gap-1 flex-1 text-sm py-2"

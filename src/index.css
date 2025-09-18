@@ -1,5 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
+
+/* PolySans Font Face Declarations */
+@font-face {
+  font-family: 'PolySans';
+  src: url('/fonts/PolySans-Neutral.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PolySans';
+  src: url('/fonts/PolySans-Median.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PolySans';
+  src: url('/fonts/PolySans-Slim.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --color-bg: 255 255 255;
@@ -24,15 +48,16 @@ html, body, #root {
 }
 
 body {
-  font-family: "Inter Tight", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: "PolySans", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   background: rgb(var(--color-bg));
   color: rgb(var(--color-fg));
+  letter-spacing: -0.025em; /* tracking-tight equivalent */
 }
 
 /* Neo-brutalist button styles */
 .btn-brutal {
   /* Neo-brutalist base: bold border, chunky offset shadow, slight motion */
-  @apply inline-flex items-center gap-2 border-2 border-black bg-white text-black font-normal px-6 py-3 text-lg select-none;
+  @apply inline-flex items-center gap-2 border-2 border-black bg-white text-black font-normal px-6 py-3 text-lg select-none tracking-tight;
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
   transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
   min-height: 44px; /* Accessible hit target */
@@ -146,7 +171,7 @@ body {
 
 /* Neo-brutalist input styles */
 .input-brutal {
-  @apply border-2 border-black bg-white text-black font-normal px-4 py-2 text-lg;
+  @apply border-2 border-black bg-white text-black font-normal px-4 py-2 text-lg tracking-tight;
   box-shadow: 2px 2px 0px 0px rgb(0,0,0);
 }
 
@@ -158,7 +183,7 @@ body {
 
 /* Neo-brutalist card styles */
 .card-brutal {
-  @apply border-2 border-black bg-white p-6;
+  @apply border-2 border-black bg-white p-6 tracking-tight;
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
 
@@ -166,7 +191,7 @@ body {
 
 /* Neo-brutalist progress bar */
 .progress-brutal {
-  @apply border-2 border-black bg-gray-200 h-8;
+  @apply border-2 border-black bg-gray-200 h-8 tracking-tight;
   box-shadow: 2px 2px 0px 0px rgb(0,0,0);
 }
 
@@ -203,7 +228,7 @@ body {
 
 /* Preset button styling for all screen sizes */
 .preset-compact {
-  @apply px-3 py-2 text-base min-w-0;
+  @apply px-3 py-2 text-base min-w-0 tracking-tight;
 }
 
 @media (max-width: 640px) {
