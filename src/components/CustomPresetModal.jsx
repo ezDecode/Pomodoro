@@ -121,8 +121,8 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
             <h3 className="text-lg font-normal mb-3">Your Presets</h3>
             <div className="space-y-2">
               {customPresets.map((preset) => (
-                <div key={preset.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg gap-3">
-                  <div className="flex-1">
+                <div key={preset.name} className="flex flex-col sm:flex-row sm:items-center p-3 bg-gray-50 rounded-lg gap-2 sm:gap-3">
+                  <div className="flex-1 min-w-0">
                     {editingPreset === preset.name ? (
                       <input
                         type="text"
@@ -132,29 +132,29 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
                           if (e.key === 'Enter') handleRenameSubmit()
                           if (e.key === 'Escape') handleRenameCancel()
                         }}
-                        className="input-brutal text-sm w-full"
+                        className="input-brutal text-sm w-full min-w-0"
                         autoFocus
                       />
                     ) : (
-                      <div className="font-normal">{preset.name}</div>
+                      <div className="font-normal truncate">{preset.name}</div>
                     )}
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 whitespace-nowrap">
                       {Math.floor(preset.work/60)}/{Math.floor(preset.shortBreak/60)}/{Math.floor(preset.longBreak/60)} - {preset.cycle} cycles
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 shrink-0 justify-end sm:justify-start">
                     {editingPreset === preset.name ? (
                       <>
                         <button
                           onClick={handleRenameSubmit}
-                          className="btn-brutal btn-success btn-icon-only"
+                          className="btn-brutal btn-success btn-sm px-2 py-1 text-sm min-w-0"
                           title="Save"
                         >
                           ✓
                         </button>
                         <button
                           onClick={handleRenameCancel}
-                          className="btn-brutal btn-neutral btn-icon-only"
+                          className="btn-brutal btn-neutral btn-sm px-2 py-1 text-sm min-w-0"
                           title="Cancel"
                         >
                           ✕
@@ -164,14 +164,14 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
                       <>
                         <button
                           onClick={() => handleRenameStart(preset)}
-                          className="btn-brutal btn-neutral btn-icon-only"
+                          className="btn-brutal btn-neutral btn-sm px-2 py-1 text-sm min-w-0"
                           title="Rename preset"
                         >
                           <Edit3 size={12} />
                         </button>
                         <button 
                           onClick={() => handleDelete(preset.name)}
-                          className="btn-brutal btn-danger btn-icon-only"
+                          className="btn-brutal btn-danger btn-sm px-2 py-1 text-sm min-w-0"
                           title="Delete preset"
                         >
                           🗑️
