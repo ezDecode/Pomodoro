@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Minus } from 'lucide-react'
 import { formatTime, calculateTotalCycleSeconds, getSessionInfo, validateTimeInput } from '../utils/helpers'
 import { TIME_LIMITS } from '../utils/constants'
@@ -31,6 +31,19 @@ export function Timer({
   const [editValue, setEditValue] = useState('')
   const [validationError, setValidationError] = useState('')
   const [adjustmentFeedback, setAdjustmentFeedback] = useState('')
+
+  // Update browser tab title with remaining time while running
+  useEffect(() => {
+    const defaultTitle = 'Study With Me'
+    if (isRunning) {
+      document.title = `${formatTime(remaining)} • ${sessionLabel}`
+    } else {
+      document.title = defaultTitle
+    }
+    return () => {
+      document.title = defaultTitle
+    }
+  }, [isRunning, remaining, sessionLabel])
 
   const handleTimerClick = () => {
     if (!isRunning) {
