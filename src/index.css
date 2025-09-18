@@ -61,6 +61,12 @@ body {
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
 
+/* Neutral button used for secondary actions and icon-only controls */
+.btn-neutral {
+  @apply border-2 border-black bg-gray-200 text-black font-normal;
+  box-shadow: 4px 4px 0px 0px rgb(0,0,0);
+}
+
 /* Neo-brutalist input styles */
 .input-brutal {
   @apply border-2 border-black bg-white text-black font-normal px-4 py-2 text-lg;
