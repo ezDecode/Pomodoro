@@ -75,8 +75,10 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
   if (!isOpen) return null
 
   return (
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 p-4">
-      <div className="card-brutal max-w-md w-full h-[600px] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative card-brutal w-full max-w-2xl max-h-[80vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-normal">Custom Presets</h2>
           <button 
