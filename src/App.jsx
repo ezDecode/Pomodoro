@@ -66,9 +66,7 @@ function App() {
     })
   }
 
-  const handleTogglePresets = () => {
-    setShowPresetModal((prev) => !prev)
-  }
+  // Removed header presets toggle to simplify UI
 
   const handleAddCustomPreset = () => {
     setShowPresetModal(true)
@@ -99,7 +97,6 @@ function App() {
           showStats={showStats}
           onToggleStats={handleToggleStats}
           onToggleSettings={handleToggleSettings}
-          onTogglePresets={handleTogglePresets}
         />
 
         <div className={`grid grid-cols-1 gap-8 ${showStats || showSettings ? 'lg:grid-cols-2' : ''}`}>
