@@ -1,12 +1,11 @@
 import { useState, useCallback } from 'react'
-import { Header, Timer, Settings, Statistics, CustomPresetModal } from './components'
+import { Header, Timer, Statistics, CustomPresetModal } from './components'
 import { useSettings } from './hooks/useSettings'
 import { useTimer } from './hooks/useTimer'
 
 function App() {
   const [sessionIndex, setSessionIndex] = useState(0)
   const [showStats, setShowStats] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
   const [showPresetModal, setShowPresetModal] = useState(false)
 
   const { 
@@ -50,19 +49,7 @@ function App() {
   }
 
   const handleToggleStats = () => {
-    setShowStats((prev) => {
-      const next = !prev
-      if (next) setShowSettings(false)
-      return next
-    })
-  }
-
-  const handleToggleSettings = () => {
-    setShowSettings((prev) => {
-      const next = !prev
-      if (next) setShowStats(false)
-      return next
-    })
+    setShowStats((prev) => !prev)
   }
 
   // Removed header presets toggle to simplify UI
@@ -95,10 +82,9 @@ function App() {
         <Header
           showStats={showStats}
           onToggleStats={handleToggleStats}
-          onToggleSettings={handleToggleSettings}
         />
 
-        <div className={`grid grid-cols-1 gap-8 ${showStats || showSettings ? 'lg:grid-cols-2' : ''}`}>
+        <div className={`grid grid-cols-1 gap-8 ${showStats ? 'lg:grid-cols-2' : ''}`}>
           <Timer
             sessionIndex={sessionIndex}
             remaining={remaining}
@@ -113,6 +99,7 @@ function App() {
             onPresetSelect={updatePreset}
             onAddCustomPreset={handleAddCustomPreset}
             onTimeUpdate={handleTimeUpdate}
+            onSettingsUpdate={updateSettings}
           />
 
           {showSettings && (
