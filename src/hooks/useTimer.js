@@ -21,57 +21,75 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
     setBreakTime(0) // Reset break time for new session
   }, [sessionDuration])
 
-  // Main timer logic
-  useEffect(() => {
-    if (!isRunning) return
-
-    timerRef.current = new Worker(
-      URL.createObjectURL(
-        new Blob([
-          `let id; onmessage=(e)=>{ if(e.data==='start'){ clearInterval(id); id=setInterval(()=>postMessage('tick'),1000); } if(e.data==='stop'){ clearInterval(id); } }`,
-        ], { type: 'text/javascript' })
-      )
-    )
-
-    const onTick = () => {
-      setRemaining((r) => {
-        if (r <= 1) {
-          // Timer completed
-          timerRef.current?.postMessage('stop')
-          timerRef.current?.terminate()
-          timerRef.current = null
-          
-          // Play notification beep
-          playNotificationBeep()
-
-          // Create session data
-          const sessionData = {
-            type: 'work', // All sessions are now work sessions
-            duration: sessionDuration,
-            breakTime: breakTime,
-            completedAt: new Date().toISOString()
-          }
-          
-          // Notify parent of session completion
-          onSessionComplete(sessionData, autoStartNext, delayNext)
-          
-          return 0
-        }
-        return r - 1
-      })
-    }
-
-    timerRef.current.onmessage = onTick
-    timerRef.current.postMessage('start')
-
-    return () => {
-      timerRef.current?.postMessage('stop')
-      timerRef.current?.terminate()
+  // Helper function to clean up timer worker
+  const cleanupTimerWorker = () => {
+    if (timerRef.current) {
+      timerRef.current.postMessage('stop')
+      timerRef.current.terminate()
       timerRef.current = null
     }
-  }, [isRunning, autoStartNext, delayNext, sessionDuration, isWork, onSessionComplete])
+  }
+
+  // Main timer logic
+  useEffect(() => {
+    if (!isRunning) {
+      cleanupTimerWorker()
+      return
+    }
+
+    // Ensure any existing worker is cleaned up first
+    cleanupTimerWorker()
+
+    // Small delay to ensure cleanup is complete
+    const startTimer = setTimeout(() => {
+      timerRef.current = new Worker(
+        URL.createObjectURL(
+          new Blob([
+            `let id; onmessage=(e)=>{ if(e.data==='start'){ clearInterval(id); id=setInterval(()=>postMessage('tick'),1000); } if(e.data==='stop'){ clearInterval(id); } }`,
+          ], { type: 'text/javascript' })
+        )
+      )
+
+      const onTick = () => {
+        setRemaining((r) => {
+          if (r <= 1) {
+            // Timer completed
+            cleanupTimerWorker()
+            
+            // Play notification beep
+            playNotificationBeep()
+
+            // Create session data
+            const sessionData = {
+              type: 'work', // All sessions are now work sessions
+              duration: sessionDuration,
+              breakTime: breakTime,
+              completedAt: new Date().toISOString()
+            }
+            
+            // Notify parent of session completion
+            onSessionComplete(sessionData, autoStartNext, delayNext)
+            
+            return 0
+          }
+          return r - 1
+        })
+      }
+
+      timerRef.current.onmessage = onTick
+      timerRef.current.postMessage('start')
+    }, 10) // Small delay to ensure cleanup
+
+    return () => {
+      clearTimeout(startTimer)
+      cleanupTimerWorker()
+    }
+  }, [isRunning, autoStartNext, delayNext, sessionDuration, isWork, onSessionComplete, breakTime])
 
   const startTimer = () => {
+    // Ensure any existing timer worker is cleaned up first
+    cleanupTimerWorker()
+    
     // If resuming from pause, stop break time tracking
     if (pauseStartTime) {
       const pauseDuration = Math.floor((Date.now() - pauseStartTime) / 1000)
@@ -90,6 +108,8 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
   }
   
   const pauseTimer = () => {
+    // Clean up main timer first
+    cleanupTimerWorker()
     setIsRunning(false)
     setPauseStartTime(Date.now())
     
@@ -110,6 +130,8 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
   }
   
   const resetTimer = () => {
+    // Clean up both timers
+    cleanupTimerWorker()
     setIsRunning(false)
     setRemaining(sessionDuration)
     setBaselineSeconds(sessionDuration)
@@ -150,6 +172,9 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
     
     // Reset break time when manually adjusting time (fresh start)
     if (safeTime !== remaining) {
+      // Clean up any running timers to prevent conflicts
+      cleanupTimerWorker()
+      
       setBreakTime(0)
       setPauseStartTime(null)
       
