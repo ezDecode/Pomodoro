@@ -1,17 +1,38 @@
-// Simple audio utility for playing completion sound
+// Optimized audio utility with preloading and caching
 let audioInstance = null
+let isPreloaded = false
+
+// Preload audio on module load for instant playback
+function preloadAudio() {
+  if (isPreloaded) return
+  
+  try {
+    audioInstance = new Audio('/sound/completionSound.mp3')
+    audioInstance.volume = 0.7
+    audioInstance.preload = 'auto'
+    
+    // Preload the audio
+    audioInstance.load()
+    isPreloaded = true
+  } catch (error) {
+    console.warn('Audio preload failed:', error)
+  }
+}
+
+// Initialize preloading immediately
+preloadAudio()
 
 export function playCompletionSound() {
   try {
-    // Stop any currently playing sound
-    if (audioInstance) {
-      audioInstance.pause()
-      audioInstance.currentTime = 0
+    // Use preloaded instance or create new one
+    if (!audioInstance || !isPreloaded) {
+      audioInstance = new Audio('/sound/completionSound.mp3')
+      audioInstance.volume = 0.7
     }
     
-    // Create new audio instance
-    audioInstance = new Audio('/sound/completionSound.mp3')
-    audioInstance.volume = 0.7 // Set reasonable volume
+    // Stop any currently playing sound
+    audioInstance.pause()
+    audioInstance.currentTime = 0
     
     // Play the sound
     const playPromise = audioInstance.play()
@@ -25,7 +46,7 @@ export function playCompletionSound() {
       })
     }
   } catch (error) {
-    console.warn('Audio initialization failed:', error)
+    console.warn('Audio playback failed:', error)
     // Fallback to programmatic beep if MP3 fails
     fallbackBeep()
   }

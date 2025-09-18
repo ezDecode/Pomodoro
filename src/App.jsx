@@ -126,7 +126,7 @@ function App() {
       />
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10 pb-20 sm:pb-24">
         <Header
           showStats={showStats}
           onToggleStats={handleToggleStats}
