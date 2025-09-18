@@ -152,11 +152,6 @@ export function Timer({
             </div>
           )}
           
-<<<<<<< Current (Your changes)
-          <div className="text-base sm:text-lg font-normal flex items-center justify-center gap-4">
-            <span>Cycle total: {formatTime(totalCycleSeconds)}</span>
-            {settings.autoStartNext && <span>Auto-start: On</span>}
-=======
           <div className="text-base sm:text-lg font-normal flex items-center justify-center gap-6">
             <span>Cycle total: {formatTime(totalCycleSeconds)}</span>
             <label className="flex items-center gap-2 cursor-pointer">
@@ -168,7 +163,6 @@ export function Timer({
               />
               <span>Auto-start next</span>
             </label>
->>>>>>> Incoming (Background Agent changes)
           </div>
         </div>
 
