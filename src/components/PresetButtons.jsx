@@ -56,6 +56,21 @@ export function PresetButtons({ onPresetSelect, onAddCustomPreset, customPresets
           )}
         </div>
       </section>
+      {/* Only show two presets to keep UI uncluttered */}
+      <div className="grid grid-cols-2 gap-3 place-items-stretch">
+        {PRESETS.slice(0, 2).map((preset) => (
+          <button 
+            key={preset.name}
+            className="btn-brutal btn-success preset-compact w-full"
+            onClick={() => {
+              onPresetSelect(preset)
+              if (onAddCustomPreset) onAddCustomPreset()
+            }}
+          >
+            {preset.name}
+          </button>
+        ))}
+      </div>
 
       {/* Add Custom Preset */}
       <div className="flex justify-center">
