@@ -3,7 +3,7 @@ import { formatTime } from '../utils/helpers'
 import { ChevronDown, ChevronUp, Filter } from 'lucide-react'
 
 export function Statistics({ settings }) {
-  const { completedSessions, totalWorkTime, totalBreakTime, sessionHistory } = settings
+  const { completedSessions, totalWorkTime, totalBreakTime, pauseCount, sessionHistory } = settings
 
   const [isSummaryOpen, setIsSummaryOpen] = useState(true)
   const [isHistoryOpen, setIsHistoryOpen] = useState(true)
@@ -35,19 +35,23 @@ export function Statistics({ settings }) {
           </button>
           {isSummaryOpen && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
-                  <div className="text-3xl font-light text-red-500">{completedSessions}</div>
+                  <div className="text-3xl font-light text-green-500">{completedSessions}</div>
                   <div className="text-sm font-normal">Sessions</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-light text-blue-500">{formatTime(totalWorkTime)}</div>
                   <div className="text-sm font-normal">Work time</div>
                 </div>
+                <div className="text-center">
+                  <div className="text-3xl font-light text-red-500">{pauseCount || 0}</div>
+                  <div className="text-sm font-normal">Pauses</div>
+                </div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-light text-green-500">{formatTime(totalBreakTime)}</div>
-                <div className="text-sm font-normal">Break time</div>
+                <div className="text-3xl font-light text-orange-500">{formatTime(totalBreakTime)}</div>
+                <div className="text-sm font-normal">Pause time</div>
               </div>
             </div>
           )}
@@ -79,7 +83,6 @@ export function Statistics({ settings }) {
               >
                 <option value="all">All</option>
                 <option value="work">Work</option>
-                <option value="break">Break</option>
               </select>
               <select
                 className="input-brutal text-sm py-1 px-2 h-8 min-w-0"
