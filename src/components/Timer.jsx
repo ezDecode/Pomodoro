@@ -158,19 +158,19 @@ export function Timer({
                 </button>
                 <button
                   onClick={() => handleQuickAdjust(-300)}
-                  className="btn-brutal btn-neutral btn-icon-only"
+                  className="btn-brutal btn-neutral btn-icon-only inline-flex items-center gap-1"
                   title="Remove 5 minutes"
                 >
                   <Minus size={16} />
-                  <span className="text-xs ml-1">5</span>
+                  <span className="text-xs">5</span>
                 </button>
                 <button
                   onClick={() => handleQuickAdjust(300)}
-                  className="btn-brutal btn-neutral btn-icon-only"
+                  className="btn-brutal btn-neutral btn-icon-only inline-flex items-center gap-1"
                   title="Add 5 minutes"
                 >
                   <Plus size={16} />
-                  <span className="text-xs ml-1">5</span>
+                  <span className="text-xs">5</span>
                 </button>
                 <button
                   onClick={() => handleQuickAdjust(60)}

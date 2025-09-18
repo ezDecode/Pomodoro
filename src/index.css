@@ -31,9 +31,11 @@ body {
 
 /* Neo-brutalist button styles */
 .btn-brutal {
-  @apply border-2 border-black bg-white text-black font-normal px-6 py-3 text-lg;
+  /* Neo-brutalist base: bold border, chunky offset shadow, slight motion */
+  @apply inline-flex items-center gap-2 border-2 border-black bg-white text-black font-normal px-6 py-3 text-lg select-none;
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
-  transition: all 0.1s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+  min-height: 44px; /* Accessible hit target */
 }
 
 .btn-brutal:hover {
@@ -46,32 +48,101 @@ body {
   box-shadow: 2px 2px 0px 0px rgb(0,0,0);
 }
 
+/* Keyboard focus visibility */
+.btn-brutal:focus-visible {
+  outline: 3px solid rgb(0,0,0);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.btn-brutal:disabled,
+.btn-brutal[aria-disabled="true"] {
+  @apply bg-gray-200 text-gray-500 border-gray-700 cursor-not-allowed;
+  transform: none;
+  box-shadow: 4px 4px 0px 0px rgb(0,0,0);
+  opacity: 0.85;
+}
+
+/* Loading state (set aria-busy="true" or .is-loading) */
+.btn-brutal[aria-busy="true"],
+.btn-brutal.is-loading {
+  pointer-events: none;
+  opacity: 0.9;
+  position: relative;
+}
+.btn-brutal[aria-busy="true"]::after,
+.btn-brutal.is-loading::after {
+  content: "";
+  position: absolute;
+  right: 0.75rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 9999px;
+  animation: btn-spin 0.6s linear infinite;
+}
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
 .btn-primary {
   @apply border-2 border-black bg-red-500 text-white font-normal;
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
+.btn-primary:hover { @apply bg-red-600; }
+.btn-primary:active { @apply bg-red-700; }
 
 .btn-secondary {
   @apply border-2 border-black bg-blue-500 text-white font-normal;
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
+.btn-secondary:hover { @apply bg-blue-600; }
+.btn-secondary:active { @apply bg-blue-700; }
 
 .btn-success {
   @apply border-2 border-black bg-green-500 text-white font-normal;
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
+.btn-success:hover { @apply bg-green-600; }
+.btn-success:active { @apply bg-green-700; }
 
 /* Destructive actions */
 .btn-danger {
   @apply border-2 border-black bg-red-600 text-white font-normal;
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
+.btn-danger:hover { @apply bg-red-700; }
+.btn-danger:active { @apply bg-red-800; }
 
 /* Neutral button used for secondary actions and icon-only controls */
 .btn-neutral {
   @apply border-2 border-black bg-gray-200 text-black font-normal;
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
+.btn-neutral:hover { @apply bg-gray-300; }
+.btn-neutral:active { @apply bg-gray-400; }
+
+/* Additional variants in the same neo-brutalist system */
+.btn-warning { @apply border-2 border-black bg-orange-400 text-black font-normal; box-shadow: 4px 4px 0px 0px rgb(0,0,0); }
+.btn-warning:hover { @apply bg-orange-500; }
+.btn-warning:active { @apply bg-orange-600; }
+
+.btn-outline { @apply bg-white text-black border-2 border-black; box-shadow: 4px 4px 0px 0px rgb(0,0,0); }
+.btn-outline:hover { @apply bg-gray-100; }
+.btn-outline:active { @apply bg-gray-200; }
+
+.btn-ghost { @apply bg-transparent text-black border-2 border-black; box-shadow: 4px 4px 0px 0px rgb(0,0,0); }
+.btn-ghost:hover { @apply bg-gray-100; }
+.btn-ghost:active { @apply bg-gray-200; }
+
+/* Size variants */
+.btn-sm { @apply px-3 py-2 text-base; min-height: 36px; }
+.btn-lg { @apply px-8 py-4 text-xl; min-height: 52px; }
+
+/* Icon-only buttons (square, centered) */
+.btn-icon-only { padding: 0.75rem; min-width: 3rem; justify-content: center; }
+.btn-icon-only svg { width: 1rem; height: 1rem; }
 
 /* Neo-brutalist input styles */
 .input-brutal {
