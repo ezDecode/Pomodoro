@@ -21,7 +21,15 @@ export function CompletionModal({
   const { completedSessions, pauseCount, totalBreakTime } = totalStats
 
   return (
-    <div className="card-brutal max-w-lg w-full mx-auto mb-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      {/* Overlay */}
+      <div 
+        className="absolute inset-0 backdrop-blur-sm"
+        onClick={() => { stopNotificationBeep(); onClose() }}
+      />
+      
+      {/* Modal Content */}
+      <div className="card-brutal max-w-lg w-full relative z-10 animate-in slide-in-from-top-4 duration-300">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
             <CheckCircle className="text-green-500" size={32} />
@@ -79,6 +87,7 @@ export function CompletionModal({
             Continue
           </button>
         </div>
+      </div>
     </div>
   )
 }

@@ -144,18 +144,6 @@ function App() {
               onTimeUpdate={handleTimeUpdate}
               onSettingsUpdate={updateSettings}
             />
-
-            {/* Session Completion Modal - Now Inline */}
-            <CompletionModal
-              isOpen={showCompletionModal}
-              onClose={handleCloseCompletionModal}
-              sessionData={completedSessionData}
-              totalStats={completedSessionData?.previousStats || {
-                completedSessions: settings.completedSessions,
-                pauseCount: settings.pauseCount,
-                totalBreakTime: settings.totalBreakTime
-              }}
-            />
           </div>
 
           {showStats && (
@@ -170,6 +158,18 @@ function App() {
         onClose={() => setShowPresetModal(false)}
         onSave={handleSaveCustomPreset}
         customPresets={customPresets}
+      />
+
+      {/* Session Completion Modal - Popup Overlay */}
+      <CompletionModal
+        isOpen={showCompletionModal}
+        onClose={handleCloseCompletionModal}
+        sessionData={completedSessionData}
+        totalStats={completedSessionData?.previousStats || {
+          completedSessions: settings.completedSessions,
+          pauseCount: settings.pauseCount,
+          totalBreakTime: settings.totalBreakTime
+        }}
       />
 
     </div>
