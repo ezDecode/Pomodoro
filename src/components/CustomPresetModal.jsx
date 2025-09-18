@@ -1,8 +1,11 @@
 import { useState } from 'react'
-import { X, Plus, Minus } from 'lucide-react'
+import { X, Plus, Minus, Edit3 } from 'lucide-react'
 import { formatTime } from '../utils/helpers'
+import { useAlert } from '../contexts/AlertContext'
 
 export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] }) {
+  const { confirm } = useAlert()
+  
   const [formData, setFormData] = useState({
     name: '',
     work: 25,
@@ -10,6 +13,8 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
     longBreak: 15,
     cycle: 4
   })
+  const [editingPreset, setEditingPreset] = useState(null)
+  const [editValue, setEditValue] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -27,9 +32,29 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
   }
 
   const handleDelete = (presetName) => {
-    if (confirm(`Delete preset "${presetName}"?`)) {
-      onSave(null, presetName) // null means delete, second param is the name to delete
+    confirm(
+      'Delete Preset',
+      `Are you sure you want to delete the preset "${presetName}"? This action cannot be undone.`,
+      () => onSave(null, presetName) // null means delete, second param is the name to delete
+    )
+  }
+
+  const handleRenameStart = (preset) => {
+    setEditingPreset(preset.name)
+    setEditValue(preset.name)
+  }
+
+  const handleRenameSubmit = () => {
+    if (editValue.trim() && editingPreset) {
+      onSave({ ...customPresets.find(p => p.name === editingPreset), name: editValue.trim() }, editingPreset)
     }
+    setEditingPreset(null)
+    setEditValue('')
+  }
+
+  const handleRenameCancel = () => {
+    setEditingPreset(null)
+    setEditValue('')
   }
 
   const handleTimeAdjust = (field, minutes) => {
@@ -96,19 +121,64 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
             <h3 className="text-lg font-normal mb-3">Your Presets</h3>
             <div className="space-y-2">
               {customPresets.map((preset) => (
-                <div key={preset.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <div className="font-normal">{preset.name}</div>
+                <div key={preset.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg gap-3">
+                  <div className="flex-1">
+                    {editingPreset === preset.name ? (
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleRenameSubmit()
+                          if (e.key === 'Escape') handleRenameCancel()
+                        }}
+                        className="input-brutal text-sm w-full"
+                        autoFocus
+                      />
+                    ) : (
+                      <div className="font-normal">{preset.name}</div>
+                    )}
                     <div className="text-sm text-gray-600">
                       {Math.floor(preset.work/60)}/{Math.floor(preset.shortBreak/60)}/{Math.floor(preset.longBreak/60)} - {preset.cycle} cycles
                     </div>
                   </div>
-                  <button 
-                    onClick={() => handleDelete(preset.name)}
-                    className="btn-brutal btn-danger text-sm px-3 py-1"
-                  >
-                    Delete
-                  </button>
+                  <div className="flex items-center gap-1">
+                    {editingPreset === preset.name ? (
+                      <>
+                        <button
+                          onClick={handleRenameSubmit}
+                          className="btn-brutal btn-success btn-icon-only"
+                          title="Save"
+                        >
+                          ✓
+                        </button>
+                        <button
+                          onClick={handleRenameCancel}
+                          className="btn-brutal btn-neutral btn-icon-only"
+                          title="Cancel"
+                        >
+                          ✕
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleRenameStart(preset)}
+                          className="btn-brutal btn-neutral btn-icon-only"
+                          title="Rename preset"
+                        >
+                          <Edit3 size={12} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(preset.name)}
+                          className="btn-brutal btn-danger btn-icon-only"
+                          title="Delete preset"
+                        >
+                          🗑️
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

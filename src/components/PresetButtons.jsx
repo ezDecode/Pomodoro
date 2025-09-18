@@ -12,7 +12,7 @@ export function PresetButtons({ onPresetSelect, onAddCustomPreset, customPresets
   }
 
   return (
-    <div className="flex gap-3 justify-center flex-wrap">
+    <div className="btn-group">
       {/* Show first 2 default presets */}
       {PRESETS.slice(0, 2).map((preset) => (
         <button 

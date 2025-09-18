@@ -169,7 +169,13 @@ body {
 .btn-lg { @apply px-8 py-4 text-xl; min-height: 52px; }
 
 /* Icon-only buttons (square, centered) */
-.btn-icon-only { padding: 0.75rem; min-width: 3rem; justify-content: center; }
+.btn-icon-only { 
+  padding: 0.75rem; 
+  min-width: 3rem; 
+  justify-content: center; 
+  align-items: center;
+  display: inline-flex;
+}
 .btn-icon-only svg { width: 1rem; height: 1rem; }
 
 /* Neo-brutalist input styles */
@@ -203,6 +209,43 @@ body {
   transition: width 0.3s ease;
 }
 
+/* Button container spacing utilities */
+.btn-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-group-compact {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Modal animations */
+@keyframes slide-in-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-in {
+  animation: slide-in-from-top 0.3s ease-out;
+}
+
+.slide-in-from-top-4 {
+  animation: slide-in-from-top 0.3s ease-out;
+}
+
 /* Responsive utilities for cleaner mobile design */
 @media (max-width: 640px) {
   .hide-text-mobile {
@@ -227,11 +270,22 @@ body {
     font-size: 0.875rem;
     min-width: auto;
   }
+  
+  .btn-group {
+    gap: 0.5rem;
+  }
+  
+  .btn-group-compact {
+    gap: 0.25rem;
+  }
 }
 
 /* Preset button styling for all screen sizes */
 .preset-compact {
   @apply px-3 py-2 text-base min-w-0 tracking-tight;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
 }
 
 @media (max-width: 640px) {

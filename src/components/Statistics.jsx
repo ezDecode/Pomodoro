@@ -1,18 +1,50 @@
 import { useMemo, useState } from 'react'
 import { formatTime } from '../utils/helpers'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Trash2, Edit3 } from 'lucide-react'
+import { useAlert } from '../contexts/AlertContext'
 
-export function Statistics({ settings }) {
+export function Statistics({ settings, onDeleteSession, onRenameSession }) {
   const { completedSessions, totalWorkTime, totalBreakTime, pauseCount, sessionHistory } = settings
+  const { confirm } = useAlert()
 
   const [isSummaryOpen, setIsSummaryOpen] = useState(true)
   const [isHistoryOpen, setIsHistoryOpen] = useState(true)
+  const [editingSession, setEditingSession] = useState(null)
+  const [editValue, setEditValue] = useState('')
   const DEFAULT_LIMIT = 10
 
   const recentHistory = useMemo(() => {
     const base = Array.isArray(sessionHistory) ? sessionHistory : []
     return base.slice(-DEFAULT_LIMIT).reverse()
   }, [sessionHistory])
+
+  const handleRenameStart = (session, index) => {
+    setEditingSession(index)
+    setEditValue(session.type || 'work')
+  }
+
+  const handleRenameSubmit = () => {
+    if (editValue.trim() && onRenameSession) {
+      onRenameSession(editingSession, editValue.trim())
+    }
+    setEditingSession(null)
+    setEditValue('')
+  }
+
+  const handleRenameCancel = () => {
+    setEditingSession(null)
+    setEditValue('')
+  }
+
+  const handleDeleteSession = (index) => {
+    if (onDeleteSession) {
+      confirm(
+        'Delete Session',
+        'Are you sure you want to delete this session? This action cannot be undone.',
+        () => onDeleteSession(index)
+      )
+    }
+  }
 
   return (
     <div className="card-brutal">
@@ -71,9 +103,62 @@ export function Statistics({ settings }) {
           {isHistoryOpen && recentHistory.length > 0 && (
             <div className="space-y-2 max-h-60 overflow-y-auto">
               {recentHistory.map((session, index) => (
-                <div key={index} className="flex justify-between items-center p-2 border-2 border-black bg-gray-100">
-                  <span className="font-normal text-sm capitalize tracking-tight">{session.type}</span>
-                  <span className="font-normal text-sm tracking-tight">{formatTime(session.duration)}</span>
+                <div key={index} className="flex justify-between items-center p-3 border-2 border-black bg-gray-100 gap-3">
+                  <div className="flex-1 flex items-center gap-2">
+                    {editingSession === index ? (
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleRenameSubmit()
+                          if (e.key === 'Escape') handleRenameCancel()
+                        }}
+                        className="input-brutal text-sm flex-1"
+                        autoFocus
+                      />
+                    ) : (
+                      <span className="font-normal text-sm capitalize tracking-tight">{session.type}</span>
+                    )}
+                    <span className="font-normal text-sm tracking-tight text-gray-600">{formatTime(session.duration)}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {editingSession === index ? (
+                      <>
+                        <button
+                          onClick={handleRenameSubmit}
+                          className="btn-brutal btn-success btn-icon-only"
+                          title="Save"
+                        >
+                          ✓
+                        </button>
+                        <button
+                          onClick={handleRenameCancel}
+                          className="btn-brutal btn-neutral btn-icon-only"
+                          title="Cancel"
+                        >
+                          ✕
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleRenameStart(session, index)}
+                          className="btn-brutal btn-neutral btn-icon-only"
+                          title="Rename session"
+                        >
+                          <Edit3 size={12} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteSession(index)}
+                          className="btn-brutal btn-danger btn-icon-only"
+                          title="Delete session"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

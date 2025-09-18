@@ -33,7 +33,7 @@ export function exportSettings(settings) {
   URL.revokeObjectURL(url)
 }
 
-export function importSettings(event, onSettingsImport) {
+export function importSettings(event, onSettingsImport, showError) {
   const file = event.target.files[0]
   if (file) {
     const reader = new FileReader()
@@ -42,7 +42,12 @@ export function importSettings(event, onSettingsImport) {
         const imported = JSON.parse(e.target.result)
         onSettingsImport(imported)
       } catch (error) {
-        alert('Invalid settings file')
+        if (showError) {
+          showError('Import Error', 'The selected file is not a valid settings file. Please try again.')
+        } else {
+          // Fallback to browser alert if no custom alert function provided
+          alert('Invalid settings file')
+        }
       }
     }
     reader.readAsText(file)

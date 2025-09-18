@@ -8,7 +8,7 @@ export function TimerControls({
   onSkip 
 }) {
   return (
-    <div className="flex flex-wrap justify-center gap-4 mb-8">
+    <div className="btn-group mb-8">
       {!isRunning ? (
         <button 
           className="btn-brutal btn-primary flex items-center gap-2 sm:gap-2 btn-icon-only"

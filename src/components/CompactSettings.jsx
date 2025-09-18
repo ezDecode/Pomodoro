@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { Settings, Download, Upload, ChevronDown, ChevronUp } from 'lucide-react'
 import { exportSettings, importSettings } from '../utils/helpers'
+import { useAlert } from '../contexts/AlertContext'
 
 export function CompactSettings({ 
   settings, 
   onSettingsUpdate, 
   onImportSettings 
 }) {
+  const { showError } = useAlert()
   const [isExpanded, setIsExpanded] = useState(false)
   const { preset, autoStartNext, delayNext } = settings
 
   const handleImportSettings = (event) => {
-    importSettings(event, onImportSettings)
+    importSettings(event, onImportSettings, showError)
   }
 
   const toggleExpanded = () => {

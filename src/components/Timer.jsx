@@ -161,7 +161,7 @@ export function Timer({
           {/* Quick Time Adjustment Buttons - Hidden when timer is running */}
           {!isRunning && !isEditing && (
             <div className="space-y-2 mb-4">
-              <div className="flex justify-center gap-2">
+              <div className="btn-group-compact">
                 <button
                   onClick={() => handleQuickAdjust(-60)}
                   className="btn-brutal btn-neutral btn-icon-only"

@@ -155,7 +155,22 @@ function App() {
           </div>
 
           {showStats && (
-            <Statistics settings={settings} />
+            <Statistics 
+              settings={settings} 
+              onDeleteSession={(index) => {
+                // Delete session from history
+                const newHistory = [...settings.sessionHistory]
+                newHistory.splice(newHistory.length - 1 - index, 1)
+                updateSettings({ sessionHistory: newHistory })
+              }}
+              onRenameSession={(index, newName) => {
+                // Rename session in history
+                const newHistory = [...settings.sessionHistory]
+                const actualIndex = newHistory.length - 1 - index
+                newHistory[actualIndex] = { ...newHistory[actualIndex], type: newName }
+                updateSettings({ sessionHistory: newHistory })
+              }}
+            />
           )}
         </div>
       </div>
