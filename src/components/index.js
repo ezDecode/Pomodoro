@@ -6,7 +6,4 @@ export { ProgressBar } from './ProgressBar'
 export { TimerControls } from './TimerControls'
 export { PresetButtons } from './PresetButtons'
 export { CustomPresetModal } from './CustomPresetModal'
-<<<<<<< Current (Your changes)
-=======
 export { CompletionModal } from './CompletionModal'
->>>>>>> Incoming (Background Agent changes)
