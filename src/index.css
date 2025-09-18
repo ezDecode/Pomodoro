@@ -79,8 +79,7 @@ body {
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
 
-/* Neo-brutalist timer display */
-.timer-display {}
+/* Neo-brutalist timer display - styles applied via Tailwind classes */
 
 /* Neo-brutalist progress bar */
 .progress-brutal {
@@ -118,8 +117,6 @@ body {
     min-width: auto;
   }
 }
-<<<<<<< Current (Your changes)
-=======
 
 /* Preset button styling for all screen sizes */
 .preset-compact {
@@ -133,4 +130,3 @@ body {
     min-width: auto;
   }
 }
->>>>>>> Incoming (Background Agent changes)
