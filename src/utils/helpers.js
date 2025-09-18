@@ -62,11 +62,73 @@ export function importSettings(event, onSettingsImport) {
 }
 
 export function parseTimeInput(input) {
-  const parts = input.split(':').map(Number)
-  if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-    return parts[0] * 60 + parts[1] // MM:SS
-  } else if (parts.length === 1 && !isNaN(parts[0])) {
-    return parts[0] * 60 // MM
+  if (!input || typeof input !== 'string') return null
+  
+  const trimmed = input.trim()
+  if (!trimmed) return null
+  
+  // Handle different time formats
+  const parts = trimmed.split(':').map(Number)
+  
+  // Check if all parts are valid numbers
+  if (parts.some(isNaN)) return null
+  
+  if (parts.length === 3) {
+    // HH:MM:SS format
+    const [hours, minutes, seconds] = parts
+    if (hours < 0 || minutes < 0 || seconds < 0 || minutes >= 60 || seconds >= 60) return null
+    return hours * 3600 + minutes * 60 + seconds
+  } else if (parts.length === 2) {
+    // MM:SS format
+    const [minutes, seconds] = parts
+    if (minutes < 0 || seconds < 0 || seconds >= 60) return null
+    return minutes * 60 + seconds
+  } else if (parts.length === 1) {
+    const value = parts[0]
+    if (value < 0) return null
+    
+    // If it's a small number (less than 60), treat as minutes
+    // If it's larger, treat as seconds
+    if (value < 60) {
+      return value * 60 // minutes
+    } else {
+      return value // seconds
+    }
   }
+  
   return null // Invalid format
+}
+
+export function validateTimeInput(input) {
+  if (!input || typeof input !== 'string') return { isValid: false, error: 'Invalid input' }
+  
+  const trimmed = input.trim()
+  if (!trimmed) return { isValid: false, error: 'Empty input' }
+  
+  const parts = trimmed.split(':').map(Number)
+  
+  if (parts.some(isNaN)) return { isValid: false, error: 'Invalid number format' }
+  
+  if (parts.length === 3) {
+    const [hours, minutes, seconds] = parts
+    if (hours < 0 || minutes < 0 || seconds < 0) return { isValid: false, error: 'Negative values not allowed' }
+    if (minutes >= 60 || seconds >= 60) return { isValid: false, error: 'Minutes/seconds must be less than 60' }
+    if (hours > 23) return { isValid: false, error: 'Hours must be less than 24' }
+    return { isValid: true, seconds: hours * 3600 + minutes * 60 + seconds }
+  } else if (parts.length === 2) {
+    const [minutes, seconds] = parts
+    if (minutes < 0 || seconds < 0) return { isValid: false, error: 'Negative values not allowed' }
+    if (seconds >= 60) return { isValid: false, error: 'Seconds must be less than 60' }
+    if (minutes > 999) return { isValid: false, error: 'Minutes must be less than 1000' }
+    return { isValid: true, seconds: minutes * 60 + seconds }
+  } else if (parts.length === 1) {
+    const value = parts[0]
+    if (value < 0) return { isValid: false, error: 'Negative values not allowed' }
+    if (value > 999) return { isValid: false, error: 'Value must be less than 1000' }
+    
+    const seconds = value < 60 ? value * 60 : value
+    return { isValid: true, seconds }
+  }
+  
+  return { isValid: false, error: 'Invalid format. Use MM:SS, HH:MM:SS, or minutes' }
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { X, Plus, Minus } from 'lucide-react'
+import { formatTime } from '../utils/helpers'
 
 export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] }) {
   const [formData, setFormData] = useState({
@@ -30,6 +31,46 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
       onSave(null, presetName) // null means delete, second param is the name to delete
     }
   }
+
+  const handleTimeAdjust = (field, minutes) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: Math.max(1, prev[field] + minutes)
+    }))
+  }
+
+  const TimeInput = ({ label, field, value, min = 1, max = 999 }) => (
+    <label className="flex flex-col gap-2">
+      <span className="font-normal">{label}</span>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => handleTimeAdjust(field, -1)}
+          className="btn-brutal btn-neutral btn-icon-only"
+          title="Remove 1 minute"
+        >
+          <Minus size={14} />
+        </button>
+        <input 
+          className="input-brutal flex-1 text-center" 
+          type="number" 
+          min={min} 
+          max={max} 
+          value={value}
+          onChange={(e) => setFormData({ ...formData, [field]: Math.max(min, Number(e.target.value)) })}
+        />
+        <button
+          onClick={() => handleTimeAdjust(field, 1)}
+          className="btn-brutal btn-neutral btn-icon-only"
+          title="Add 1 minute"
+        >
+          <Plus size={14} />
+        </button>
+      </div>
+      <div className="text-xs text-gray-500 text-center">
+        {formatTime(value * 60)}
+      </div>
+    </label>
+  )
 
   if (!isOpen) return null
 
@@ -89,49 +130,53 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
           </label>
 
           <div className="grid grid-cols-2 gap-4">
-            <label className="flex flex-col gap-2">
-              <span className="font-normal">Work (min)</span>
-              <input 
-                className="input-brutal" 
-                type="number" 
-                min={1} 
-                max={999} 
-                value={formData.work}
-                onChange={(e) => setFormData({ ...formData, work: Math.max(1, Number(e.target.value)) })}
-              />
-            </label>
-            <label className="flex flex-col gap-2">
-              <span className="font-normal">Short break (min)</span>
-              <input 
-                className="input-brutal" 
-                type="number" 
-                min={1} 
-                max={999} 
-                value={formData.shortBreak}
-                onChange={(e) => setFormData({ ...formData, shortBreak: Math.max(1, Number(e.target.value)) })}
-              />
-            </label>
-            <label className="flex flex-col gap-2">
-              <span className="font-normal">Long break (min)</span>
-              <input 
-                className="input-brutal" 
-                type="number" 
-                min={1} 
-                max={999} 
-                value={formData.longBreak}
-                onChange={(e) => setFormData({ ...formData, longBreak: Math.max(1, Number(e.target.value)) })}
-              />
-            </label>
+            <TimeInput 
+              label="Work (min)" 
+              field="work" 
+              value={formData.work} 
+              min={1} 
+              max={999} 
+            />
+            <TimeInput 
+              label="Short break (min)" 
+              field="shortBreak" 
+              value={formData.shortBreak} 
+              min={1} 
+              max={999} 
+            />
+            <TimeInput 
+              label="Long break (min)" 
+              field="longBreak" 
+              value={formData.longBreak} 
+              min={1} 
+              max={999} 
+            />
             <label className="flex flex-col gap-2">
               <span className="font-normal">Cycle (sessions)</span>
-              <input 
-                className="input-brutal" 
-                type="number" 
-                min={1} 
-                max={99} 
-                value={formData.cycle}
-                onChange={(e) => setFormData({ ...formData, cycle: Math.max(1, Number(e.target.value)) })}
-              />
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setFormData({ ...formData, cycle: Math.max(1, formData.cycle - 1) })}
+                  className="btn-brutal btn-neutral btn-icon-only"
+                  title="Decrease cycle"
+                >
+                  <Minus size={14} />
+                </button>
+                <input 
+                  className="input-brutal flex-1 text-center" 
+                  type="number" 
+                  min={1} 
+                  max={99} 
+                  value={formData.cycle}
+                  onChange={(e) => setFormData({ ...formData, cycle: Math.max(1, Number(e.target.value)) })}
+                />
+                <button
+                  onClick={() => setFormData({ ...formData, cycle: Math.min(99, formData.cycle + 1) })}
+                  className="btn-brutal btn-neutral btn-icon-only"
+                  title="Increase cycle"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
             </label>
           </div>
 

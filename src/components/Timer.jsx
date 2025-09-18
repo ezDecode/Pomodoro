@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { formatTime, calculateTotalCycleSeconds, getSessionInfo, parseTimeInput } from '../utils/helpers'
+import { Plus, Minus } from 'lucide-react'
+import { formatTime, calculateTotalCycleSeconds, getSessionInfo, parseTimeInput, validateTimeInput } from '../utils/helpers'
 import { ProgressBar } from './ProgressBar'
 import { TimerControls } from './TimerControls'
 import { PresetButtons } from './PresetButtons'
@@ -24,29 +25,44 @@ export function Timer({
   const totalCycleSeconds = calculateTotalCycleSeconds(preset)
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
+  const [validationError, setValidationError] = useState('')
 
   const handleTimerClick = () => {
     if (!isRunning) {
       setIsEditing(true)
       setEditValue(formatTime(remaining))
+      setValidationError('')
     }
   }
 
   const handleTimeEdit = (e) => {
-    setEditValue(e.target.value)
+    const value = e.target.value
+    setEditValue(value)
+    
+    // Real-time validation
+    const validation = validateTimeInput(value)
+    if (validation.isValid) {
+      setValidationError('')
+    } else {
+      setValidationError(validation.error)
+    }
   }
 
   const handleTimeSubmit = () => {
-    const newTime = parseTimeInput(editValue)
-    if (newTime !== null && newTime >= 0) {
-      onTimeUpdate(newTime)
+    const validation = validateTimeInput(editValue)
+    if (validation.isValid) {
+      onTimeUpdate(validation.seconds)
+      setIsEditing(false)
+      setValidationError('')
+    } else {
+      setValidationError(validation.error)
     }
-    setIsEditing(false)
   }
 
   const handleTimeCancel = () => {
     setIsEditing(false)
     setEditValue('')
+    setValidationError('')
   }
 
   const handleKeyPress = (e) => {
@@ -54,6 +70,13 @@ export function Timer({
       handleTimeSubmit()
     } else if (e.key === 'Escape') {
       handleTimeCancel()
+    }
+  }
+
+  const handleQuickAdjust = (seconds) => {
+    if (!isRunning) {
+      const newTime = Math.max(0, remaining + seconds)
+      onTimeUpdate(newTime)
     }
   }
 
@@ -68,20 +91,66 @@ export function Timer({
             title={!isRunning ? "Click to edit time" : "Stop timer to edit"}
           >
             {isEditing ? (
-              <input
-                type="text"
-                value={editValue}
-                onChange={handleTimeEdit}
-                onBlur={handleTimeSubmit}
-                onKeyDown={handleKeyPress}
-                className="bg-transparent border-none outline-none text-center w-full text-6xl sm:text-7xl md:text-8xl font-light tracking-tight"
-                autoFocus
-                placeholder="MM:SS"
-              />
+              <div className="w-full">
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={handleTimeEdit}
+                  onBlur={handleTimeSubmit}
+                  onKeyDown={handleKeyPress}
+                  className={`bg-transparent border-none outline-none text-center w-full text-6xl sm:text-7xl md:text-8xl font-light tracking-tight ${
+                    validationError ? 'text-red-500' : ''
+                  }`}
+                  autoFocus
+                  placeholder="MM:SS or HH:MM:SS"
+                />
+                {validationError && (
+                  <div className="text-sm text-red-500 mt-2">
+                    {validationError}
+                  </div>
+                )}
+              </div>
             ) : (
               formatTime(remaining)
             )}
           </div>
+          
+          {/* Quick Time Adjustment Buttons */}
+          {!isRunning && !isEditing && (
+            <div className="flex justify-center gap-2 mb-4">
+              <button
+                onClick={() => handleQuickAdjust(-60)}
+                className="btn-brutal btn-neutral btn-icon-only"
+                title="Remove 1 minute"
+              >
+                <Minus size={16} />
+              </button>
+              <button
+                onClick={() => handleQuickAdjust(-300)}
+                className="btn-brutal btn-neutral btn-icon-only"
+                title="Remove 5 minutes"
+              >
+                <Minus size={16} />
+                <span className="text-xs ml-1">5</span>
+              </button>
+              <button
+                onClick={() => handleQuickAdjust(300)}
+                className="btn-brutal btn-neutral btn-icon-only"
+                title="Add 5 minutes"
+              >
+                <Plus size={16} />
+                <span className="text-xs ml-1">5</span>
+              </button>
+              <button
+                onClick={() => handleQuickAdjust(60)}
+                className="btn-brutal btn-neutral btn-icon-only"
+                title="Add 1 minute"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+          )}
+          
           <div className="text-base sm:text-lg font-normal">
             Cycle total: {formatTime(totalCycleSeconds)}
           </div>

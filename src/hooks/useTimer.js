@@ -6,20 +6,15 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
   const { sessionDuration, isWork } = getSessionInfo(sessionIndex, preset)
   
   const [remaining, setRemaining] = useState(sessionDuration)
+  const [baselineSeconds, setBaselineSeconds] = useState(sessionDuration)
   const [isRunning, setIsRunning] = useState(false)
   const timerRef = useRef(null)
 
-  // Update remaining time when session changes
+  // Update remaining time and baseline when session changes
   useEffect(() => {
     setRemaining(sessionDuration)
+    setBaselineSeconds(sessionDuration)
   }, [sessionDuration])
-
-  // Reset remaining time when session index changes and timer is running
-  useEffect(() => {
-    if (isRunning) {
-      setRemaining(sessionDuration)
-    }
-  }, [sessionIndex, sessionDuration, isRunning])
 
   // Main timer logic
   useEffect(() => {
@@ -75,9 +70,18 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
   const resetTimer = () => {
     setIsRunning(false)
     setRemaining(sessionDuration)
+    setBaselineSeconds(sessionDuration)
   }
 
-  const progress = ((sessionDuration - remaining) / sessionDuration) * 100
+  const progressBase = baselineSeconds > 0 ? baselineSeconds : sessionDuration
+  const progress = Math.min(100, Math.max(0, ((progressBase - remaining) / progressBase) * 100))
+
+  // When user manually sets time (via editor or quick adjust), also update baseline
+  const setRemainingManual = (seconds) => {
+    const safe = Math.max(0, Number(seconds) || 0)
+    setRemaining(safe)
+    setBaselineSeconds(safe || sessionDuration)
+  }
 
   return {
     remaining,
@@ -86,6 +90,7 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
     startTimer,
     pauseTimer,
     resetTimer,
-    setRemaining
+    setRemaining,
+    setRemainingManual
   }
 }

@@ -1,5 +1,6 @@
-import { Download, Upload } from 'lucide-react'
-import { exportSettings, importSettings } from '../utils/helpers'
+import { useState } from 'react'
+import { Download, Upload, Plus, Minus } from 'lucide-react'
+import { exportSettings, importSettings, formatTime } from '../utils/helpers'
 
 export function Settings({ 
   settings, 
@@ -7,126 +8,205 @@ export function Settings({
   onImportSettings 
 }) {
   const { preset, autoStartNext, delayNext, volume } = settings
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   const handleImportSettings = (event) => {
     importSettings(event, onImportSettings)
   }
 
+  const handleTimeAdjust = (field, seconds) => {
+    const currentValue = preset[field]
+    const newValue = Math.max(60, currentValue + seconds) // Minimum 1 minute
+    onSettingsUpdate({
+      preset: { ...preset, [field]: newValue }
+    })
+  }
+
+  const handleTimeInputChange = (field, value) => {
+    const seconds = Math.max(60, Number(value) * 60) // Minimum 1 minute
+    onSettingsUpdate({
+      preset: { ...preset, [field]: seconds }
+    })
+  }
+
+  const TimeInput = ({ label, field, value, min = 1, max = 999 }) => (
+    <label className="flex flex-col gap-2">
+      <span className="font-normal">{label}</span>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => handleTimeAdjust(field, -60)}
+          className="btn-brutal btn-neutral btn-icon-only"
+          title="Remove 1 minute"
+        >
+          <Minus size={14} />
+        </button>
+        <input 
+          className="input-brutal flex-1 text-center" 
+          type="number" 
+          min={min} 
+          max={max} 
+          value={Math.floor(value/60)} 
+          onChange={(e) => handleTimeInputChange(field, e.target.value)}
+        />
+        <button
+          onClick={() => handleTimeAdjust(field, 60)}
+          className="btn-brutal btn-neutral btn-icon-only"
+          title="Add 1 minute"
+        >
+          <Plus size={14} />
+        </button>
+      </div>
+      <div className="text-xs text-gray-500 text-center">
+        {formatTime(value)}
+      </div>
+    </label>
+  )
+
   return (
     <div className="card-brutal">
-      <h2 className="text-2xl font-normal mb-6">Settings</h2>
-      
-      <div className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <label className="flex flex-col gap-2">
-            <span className="font-normal">Work (min)</span>
-            <input 
-              className="input-brutal" 
-              type="number" 
-              min={0} 
-              max={999} 
-              value={Math.floor(preset.work/60)} 
-              onChange={(e) => onSettingsUpdate({
-                preset: { ...preset, work: Math.max(0, Number(e.target.value)) * 60 }
-              })} 
-            />
-          </label>
-          <label className="flex flex-col gap-2">
-            <span className="font-normal">Short break (min)</span>
-            <input 
-              className="input-brutal" 
-              type="number" 
-              min={0} 
-              max={999} 
-              value={Math.floor(preset.shortBreak/60)} 
-              onChange={(e) => onSettingsUpdate({
-                preset: { ...preset, shortBreak: Math.max(0, Number(e.target.value)) * 60 }
-              })} 
-            />
-          </label>
-          <label className="flex flex-col gap-2">
-            <span className="font-normal">Long break (min)</span>
-            <input 
-              className="input-brutal" 
-              type="number" 
-              min={0} 
-              max={999} 
-              value={Math.floor(preset.longBreak/60)} 
-              onChange={(e) => onSettingsUpdate({
-                preset: { ...preset, longBreak: Math.max(0, Number(e.target.value)) * 60 }
-              })} 
-            />
-          </label>
-          <label className="flex flex-col gap-2">
-            <span className="font-normal">Cycle (sessions)</span>
-            <input 
-              className="input-brutal" 
-              type="number" 
+      <div className="mb-6">
+        <h2 className="text-2xl font-normal">Settings</h2>
+        <p className="text-sm text-gray-600 mt-1">Tune your focus and break durations. Advanced options are tucked away.</p>
+      </div>
+
+      <div className="space-y-8">
+        {/* Focus & Breaks */}
+        <section>
+          <h3 className="text-base font-medium mb-4">Focus & Breaks</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <TimeInput 
+              label="Work (min)" 
+              field="work" 
+              value={preset.work} 
               min={1} 
-              max={99} 
-              value={preset.cycle} 
-              onChange={(e) => onSettingsUpdate({
-                preset: { ...preset, cycle: Math.max(1, Number(e.target.value)) }
-              })} 
+              max={999} 
             />
-          </label>
-        </div>
+            <TimeInput 
+              label="Short break (min)" 
+              field="shortBreak" 
+              value={preset.shortBreak} 
+              min={1} 
+              max={999} 
+            />
+            <TimeInput 
+              label="Long break (min)" 
+              field="longBreak" 
+              value={preset.longBreak} 
+              min={1} 
+              max={999} 
+            />
+            <label className="flex flex-col gap-2">
+              <span className="font-normal">Cycle (sessions)</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => onSettingsUpdate({
+                    preset: { ...preset, cycle: Math.max(1, preset.cycle - 1) }
+                  })}
+                  className="btn-brutal btn-neutral btn-icon-only"
+                  title="Decrease cycle"
+                >
+                  <Minus size={14} />
+                </button>
+                <input 
+                  className="input-brutal flex-1 text-center" 
+                  type="number" 
+                  min={1} 
+                  max={99} 
+                  value={preset.cycle} 
+                  onChange={(e) => onSettingsUpdate({
+                    preset: { ...preset, cycle: Math.max(1, Number(e.target.value)) }
+                  })} 
+                />
+                <button
+                  onClick={() => onSettingsUpdate({
+                    preset: { ...preset, cycle: Math.min(99, preset.cycle + 1) }
+                  })}
+                  className="btn-brutal btn-neutral btn-icon-only"
+                  title="Increase cycle"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
+            </label>
+          </div>
+        </section>
 
-        <div className="space-y-4">
-          <label className="flex items-center justify-between gap-4">
-            <span className="font-normal">Auto-start next</span>
-            <input 
-              type="checkbox" 
-              checked={autoStartNext} 
-              onChange={(e) => onSettingsUpdate({ autoStartNext: e.target.checked })}
-              className="w-6 h-6"
-            />
-          </label>
-          <label className="flex items-center justify-between gap-4">
-            <span className="font-normal">Delay (sec)</span>
-            <input 
-              className="input-brutal w-24" 
-              type="number" 
-              min={0} 
-              max={60} 
-              value={delayNext} 
-              onChange={(e) => onSettingsUpdate({ delayNext: Math.max(0, Number(e.target.value)) })} 
-            />
-          </label>
-          <label className="flex items-center justify-between gap-4">
-            <span className="font-normal">Volume</span>
-            <input 
-              className="w-full" 
-              type="range" 
-              min={0} 
-              max={1} 
-              step={0.01} 
-              value={volume} 
-              onChange={(e) => onSettingsUpdate({ volume: Number(e.target.value) })} 
-            />
-          </label>
-        </div>
+        {/* Behavior */}
+        <section>
+          <h3 className="text-base font-medium mb-4">Behavior</h3>
+          <div className="grid grid-cols-1 gap-4">
+            <label className="flex items-center justify-between gap-4">
+              <span className="font-normal">Auto-start next</span>
+              <input 
+                type="checkbox" 
+                checked={autoStartNext} 
+                onChange={(e) => onSettingsUpdate({ autoStartNext: e.target.checked })}
+                className="w-6 h-6"
+              />
+            </label>
 
-        <div className="flex gap-4">
-          <button 
-            className="btn-brutal btn-success flex items-center gap-2 sm:gap-2 flex-1 btn-icon-only"
-            onClick={() => exportSettings(settings)}
-            title="Export settings"
+            <label className="flex items-center justify-between gap-4">
+              <span className="font-normal">Volume</span>
+              <input 
+                className="w-full" 
+                type="range" 
+                min={0} 
+                max={1} 
+                step={0.01} 
+                value={volume} 
+                onChange={(e) => onSettingsUpdate({ volume: Number(e.target.value) })} 
+              />
+            </label>
+          </div>
+        </section>
+
+        {/* Advanced toggle */}
+        <section>
+          <button
+            className="btn-brutal btn-neutral text-sm"
+            onClick={() => setShowAdvanced((v) => !v)}
+            title="Toggle advanced options"
           >
-            <Download size={16} />
-            <span className="hide-text-mobile">Export</span>
+            {showAdvanced ? 'Hide advanced' : 'Show advanced'}
           </button>
-          <label className="btn-brutal btn-secondary flex items-center gap-2 sm:gap-2 flex-1 cursor-pointer btn-icon-only" title="Import settings">
-            <Upload size={16} />
-            <span className="hide-text-mobile">Import</span>
-            <input 
-              type="file" 
-              accept=".json" 
-              onChange={handleImportSettings}
-              className="hidden"
-            />
-          </label>
-        </div>
+
+          {showAdvanced && (
+            <div className="mt-4 space-y-4">
+              <label className="flex items-center justify-between gap-4">
+                <span className="font-normal">Delay before next (sec)</span>
+                <input 
+                  className="input-brutal w-28" 
+                  type="number" 
+                  min={0} 
+                  max={60} 
+                  value={delayNext} 
+                  onChange={(e) => onSettingsUpdate({ delayNext: Math.max(0, Number(e.target.value)) })} 
+                />
+              </label>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button 
+                  className="btn-brutal btn-success flex items-center justify-center gap-2 flex-1"
+                  onClick={() => exportSettings(settings)}
+                  title="Export settings"
+                >
+                  <Download size={16} />
+                  Export
+                </button>
+                <label className="btn-brutal btn-secondary flex items-center justify-center gap-2 flex-1 cursor-pointer" title="Import settings">
+                  <Upload size={16} />
+                  Import
+                  <input 
+                    type="file" 
+                    accept=".json" 
+                    onChange={handleImportSettings}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   )

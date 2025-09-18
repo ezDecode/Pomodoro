@@ -36,13 +36,14 @@ function App() {
     startTimer, 
     pauseTimer, 
     resetTimer,
-    setRemaining
+    setRemaining,
+    setRemainingManual
   } = useTimer(sessionIndex, settings, handleSessionComplete)
 
   const handleTimeUpdate = useCallback((newTime) => {
     pauseTimer()
-    setRemaining(newTime)
-  }, [pauseTimer, setRemaining])
+    setRemainingManual(newTime)
+  }, [pauseTimer, setRemainingManual])
 
   const handleSkip = () => {
     setSessionIndex((i) => i + 1)
