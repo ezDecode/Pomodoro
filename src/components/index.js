@@ -1,6 +1,5 @@
 export { Header } from './Header'
 export { Timer } from './Timer'
-export { Settings } from './Settings'
 export { Statistics } from './Statistics'
 export { CompactSettings } from './CompactSettings'
 export { ProgressBar } from './ProgressBar'

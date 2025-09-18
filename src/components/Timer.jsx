@@ -18,7 +18,8 @@ export function Timer({
   onSkip,
   onPresetSelect,
   onAddCustomPreset,
-  onTimeUpdate
+  onTimeUpdate,
+  onSettingsUpdate
 }) {
   const { preset } = settings
   const { sessionLabel } = getSessionInfo(sessionIndex, preset)
@@ -151,9 +152,17 @@ export function Timer({
             </div>
           )}
           
-          <div className="text-base sm:text-lg font-normal flex items-center justify-center gap-4">
+          <div className="text-base sm:text-lg font-normal flex items-center justify-center gap-6">
             <span>Cycle total: {formatTime(totalCycleSeconds)}</span>
-            {settings.autoStartNext && <span>Auto-start: On</span>}
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={settings.autoStartNext} 
+                onChange={(e) => onSettingsUpdate({ autoStartNext: e.target.checked })}
+                className="w-4 h-4"
+              />
+              <span>Auto-start next</span>
+            </label>
           </div>
         </div>
 

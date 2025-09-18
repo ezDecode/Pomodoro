@@ -55,9 +55,9 @@ export function Statistics({ settings }) {
 
         {/* History Section */}
         <section>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <button
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 self-start"
               onClick={() => setIsHistoryOpen(v => !v)}
               title="Toggle history"
             >
@@ -66,10 +66,13 @@ export function Statistics({ settings }) {
             </button>
 
             {/* Filters */}
-            <div className="flex items-center gap-2">
-              <Filter size={14} className="text-gray-600" />
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1 text-sm text-gray-600">
+                <Filter size={14} />
+                <span>Filter:</span>
+              </div>
               <select
-                className="input-brutal text-sm py-1 px-2 h-9"
+                className="input-brutal text-sm py-1 px-2 h-8 min-w-0"
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
                 title="Filter by type"
@@ -79,7 +82,7 @@ export function Statistics({ settings }) {
                 <option value="break">Break</option>
               </select>
               <select
-                className="input-brutal text-sm py-1 px-2 h-9"
+                className="input-brutal text-sm py-1 px-2 h-8 min-w-0"
                 value={limit}
                 onChange={(e) => setLimit(Number(e.target.value))}
                 title="Limit entries"
