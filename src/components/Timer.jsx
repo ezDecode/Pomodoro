@@ -12,6 +12,7 @@ export function Timer({
   isRunning,
   progress,
   breakTime = 0,
+  carryoverBreakTime = 0,
   settings,
   customPresets = [],
   onStart,
@@ -204,6 +205,13 @@ export function Timer({
               <div className="text-center">
                 <div className="text-sm text-orange-600">
                   Break time this session: <span className="font-medium">{formatTime(breakTime)}</span>
+                </div>
+              </div>
+            )}
+            {carryoverBreakTime > 0 && (
+              <div className="text-center">
+                <div className="text-sm text-purple-600">
+                  + Carryover from previous session: <span className="font-medium">{formatTime(carryoverBreakTime)}</span>
                 </div>
               </div>
             )}
