@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { startNotificationBeep, getSessionInfo } from '../utils/helpers'
+import { getSessionInfo } from '../utils/helpers'
+import { playCompletionSound } from '../utils/sound'
 import { TIME_LIMITS } from '../utils/constants'
 
 export function useTimer(sessionIndex, settings, onSessionComplete, carryoverBreakTime = 0, onCarryoverUsed) {
@@ -76,8 +77,8 @@ export function useTimer(sessionIndex, settings, onSessionComplete, carryoverBre
             cleanupTimerWorker()
             setIsRunning(false)
 
-            // Play notification beep once
-            startNotificationBeep(200)
+            // Play completion sound
+            playCompletionSound()
 
             // Create session data
             const sessionData = {

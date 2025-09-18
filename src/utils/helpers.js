@@ -6,53 +6,6 @@ export function formatTime(totalSeconds) {
   return `${hh}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
-// Simple controllable notification beep
-let __beepCtx = null
-let __beepOsc = null
-let __beepGain = null
-
-export function startNotificationBeep(durationMs = 200) {
-  stopNotificationBeep()
-  try {
-    __beepCtx = new (window.AudioContext || window.webkitAudioContext)()
-    __beepOsc = __beepCtx.createOscillator()
-    __beepGain = __beepCtx.createGain()
-    __beepOsc.type = 'square'
-    __beepOsc.frequency.value = 880
-    __beepGain.gain.value = 1.0
-    __beepOsc.connect(__beepGain)
-    __beepGain.connect(__beepCtx.destination)
-    __beepOsc.start()
-    if (durationMs && durationMs > 0) {
-      setTimeout(() => {
-        stopNotificationBeep()
-      }, durationMs)
-    }
-  } catch {
-    // Ignore audio errors
-  }
-}
-
-export function stopNotificationBeep() {
-  try {
-    if (__beepOsc) {
-      __beepOsc.stop()
-    }
-  } catch {}
-  try {
-    if (__beepCtx) {
-      __beepCtx.close()
-    }
-  } catch {}
-  __beepOsc = null
-  __beepGain = null
-  __beepCtx = null
-}
-
-// Backward compatibility: legacy named export used before refactor
-export function playNotificationBeep() {
-  startNotificationBeep(200)
-}
 
 export function calculateTotalCycleSeconds(preset) {
   // Since we removed breaks, cycle is just work sessions
@@ -103,55 +56,34 @@ export function validateTimeInput(input) {
   const trimmed = input.trim()
   if (!trimmed) return { isValid: false, error: 'Empty input' }
   
-  // Remove any non-digit, non-colon characters and handle common input mistakes
   const cleaned = trimmed.replace(/[^\d:]/g, '')
   if (!cleaned) return { isValid: false, error: 'No valid numbers found' }
   
-  const parts = cleaned.split(':').map(part => {
-    const num = parseInt(part, 10)
-    return isNaN(num) ? 0 : num
-  }).filter((_, index, arr) => index === 0 || arr[index - 1] !== undefined)
-  
-  // Handle empty parts after colon
+  const parts = cleaned.split(':').map(part => parseInt(part, 10) || 0)
   if (parts.some(isNaN)) return { isValid: false, error: 'Invalid number format' }
   
-  // Use consistent time limits (imported at top of function to avoid circular imports)
-  const maxHours = 8
-  const maxMinutes = 480 // 8 hours worth of minutes  
-  const maxSeconds = 28800 // 8 hours worth of seconds
+  const MAX_HOURS = 8, MAX_SECONDS = 28800
   
   if (parts.length === 3) {
-    const [hours, minutes, seconds] = parts
-    if (hours < 0 || minutes < 0 || seconds < 0) return { isValid: false, error: 'Negative values not allowed' }
-    if (minutes >= 60 || seconds >= 60) return { isValid: false, error: 'Minutes/seconds must be less than 60' }
-    if (hours > maxHours) return { isValid: false, error: `Hours must be less than ${maxHours + 1}` }
-    
-    const totalSeconds = hours * 3600 + minutes * 60 + seconds
-    if (totalSeconds === 0) return { isValid: false, error: 'Time cannot be zero' }
-    if (totalSeconds > maxSeconds) return { isValid: false, error: `Total time cannot exceed ${maxHours} hours` }
-    
-    return { isValid: true, seconds: totalSeconds }
-  } else if (parts.length === 2) {
-    const [minutes, seconds] = parts
-    if (minutes < 0 || seconds < 0) return { isValid: false, error: 'Negative values not allowed' }
-    if (seconds >= 60) return { isValid: false, error: 'Seconds must be less than 60' }
-    if (minutes > maxMinutes) return { isValid: false, error: `Minutes must be less than ${maxMinutes + 1}` }
-    
-    const totalSeconds = minutes * 60 + seconds
-    if (totalSeconds === 0) return { isValid: false, error: 'Time cannot be zero' }
-    
-    return { isValid: true, seconds: totalSeconds }
-  } else if (parts.length === 1) {
+    const [h, m, s] = parts
+    if (m >= 60 || s >= 60) return { isValid: false, error: 'Minutes/seconds must be < 60' }
+    if (h > MAX_HOURS) return { isValid: false, error: `Hours must be ≤ ${MAX_HOURS}` }
+    const total = h * 3600 + m * 60 + s
+    return total === 0 ? { isValid: false, error: 'Time cannot be zero' } : { isValid: true, seconds: total }
+  } 
+  
+  if (parts.length === 2) {
+    const [m, s] = parts
+    if (s >= 60) return { isValid: false, error: 'Seconds must be < 60' }
+    const total = m * 60 + s
+    return total === 0 ? { isValid: false, error: 'Time cannot be zero' } : { isValid: true, seconds: total }
+  }
+  
+  if (parts.length === 1) {
     const value = parts[0]
-    if (value < 0) return { isValid: false, error: 'Negative values not allowed' }
     if (value === 0) return { isValid: false, error: 'Time cannot be zero' }
-    if (value > maxMinutes) return { isValid: false, error: `Value must be less than ${maxMinutes + 1}` }
-    
-    // Interpret single numbers as minutes if under 60, otherwise as seconds
     const seconds = value <= 60 ? value * 60 : value
-    if (seconds > maxSeconds) return { isValid: false, error: `Total time cannot exceed ${maxHours} hours` }
-    
-    return { isValid: true, seconds }
+    return seconds > MAX_SECONDS ? { isValid: false, error: `Max ${MAX_HOURS} hours` } : { isValid: true, seconds }
   }
   
   return { isValid: false, error: 'Invalid format. Use MM:SS, HH:MM:SS, or minutes' }
