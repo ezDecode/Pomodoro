@@ -189,7 +189,7 @@ function App() {
           </div>
           <div className="flex gap-4">
             <button 
-              className="btn-brutal btn-secondary flex items-center gap-2"
+              className="btn-brutal btn-secondary flex items-center gap-2 sm:gap-2 btn-icon-only"
               onClick={() => {
                 setShowStats((prev) => {
                   const next = !prev
@@ -197,12 +197,13 @@ function App() {
                   return next
                 })
               }}
+              title="Statistics"
             >
               <BarChart3 size={20} />
-              Stats
+              <span className="hide-text-mobile">Stats</span>
             </button>
             <button 
-              className="btn-brutal btn-secondary flex items-center gap-2"
+              className="btn-brutal btn-secondary flex items-center gap-2 sm:gap-2 btn-icon-only"
               onClick={() => {
                 setShowSettings((prev) => {
                   const next = !prev
@@ -210,9 +211,10 @@ function App() {
                   return next
                 })
               }}
+              title="Settings"
             >
               <Settings size={20} />
-              Settings
+              <span className="hide-text-mobile">Settings</span>
             </button>
           </div>
         </div>
@@ -239,53 +241,57 @@ function App() {
               <div className="flex flex-wrap justify-center gap-4 mb-8">
                 {!isRunning ? (
                   <button 
-                    className="btn-brutal btn-primary flex items-center gap-2"
+                    className="btn-brutal btn-primary flex items-center gap-2 sm:gap-2 btn-icon-only"
                     onClick={() => setIsRunning(true)}
+                    title="Start timer"
                   >
                     <Play size={20} />
-                    Start
+                    <span className="hide-text-mobile">Start</span>
                   </button>
                 ) : (
                   <button 
-                    className="btn-brutal btn-secondary flex items-center gap-2"
+                    className="btn-brutal btn-secondary flex items-center gap-2 sm:gap-2 btn-icon-only"
                     onClick={() => setIsRunning(false)}
+                    title="Pause timer"
                   >
                     <Pause size={20} />
-                    Pause
+                    <span className="hide-text-mobile">Pause</span>
                   </button>
                 )}
                 <button 
-                  className="btn-brutal flex items-center gap-2"
+                  className="btn-brutal flex items-center gap-2 sm:gap-2 btn-icon-only"
                   onClick={() => { setIsRunning(false); setRemaining(sessionDuration); }}
+                  title="Reset timer"
                 >
                   <RotateCcw size={20} />
-                  Reset
+                  <span className="hide-text-mobile">Reset</span>
                 </button>
                 <button 
-                  className="btn-brutal flex items-center gap-2"
+                  className="btn-brutal flex items-center gap-2 sm:gap-2 btn-icon-only"
                   onClick={() => { setSessionIndex((i) => i + 1); setIsRunning(false); }}
+                  title="Skip to next session"
                 >
                   <SkipForward size={20} />
-                  Skip
+                  <span className="hide-text-mobile">Skip</span>
                 </button>
               </div>
 
               {/* Presets */}
               <div className="flex flex-wrap justify-center gap-4">
                 <button 
-                  className="btn-brutal btn-success"
+                  className="btn-brutal btn-success preset-compact"
                   onClick={() => setSettings(prev => ({ ...prev, preset: {name:'25/5/15',work:1500,shortBreak:300,longBreak:900,cycle:4} }))}
                 >
                   25/5/15
                 </button>
                 <button 
-                  className="btn-brutal btn-success"
+                  className="btn-brutal btn-success preset-compact"
                   onClick={() => setSettings(prev => ({ ...prev, preset: {name:'50/10/20',work:3000,shortBreak:600,longBreak:1200,cycle:3} }))}
                 >
                   50/10/20
                 </button>
                 <button 
-                  className="btn-brutal btn-success"
+                  className="btn-brutal btn-success preset-compact"
                   onClick={() => setSettings(prev => ({ ...prev, preset: {name:'90/20/30',work:5400,shortBreak:1200,longBreak:1800,cycle:2} }))}
                 >
                   90/20/30
@@ -396,15 +402,16 @@ function App() {
 
                 <div className="flex gap-4">
                   <button 
-                    className="btn-brutal btn-success flex items-center gap-2 flex-1"
+                    className="btn-brutal btn-success flex items-center gap-2 sm:gap-2 flex-1 btn-icon-only"
                     onClick={exportSettings}
+                    title="Export settings"
                   >
                     <Download size={16} />
-                    Export
+                    <span className="hide-text-mobile">Export</span>
         </button>
-                  <label className="btn-brutal btn-secondary flex items-center gap-2 flex-1 cursor-pointer">
+                  <label className="btn-brutal btn-secondary flex items-center gap-2 sm:gap-2 flex-1 cursor-pointer btn-icon-only" title="Import settings">
                     <Upload size={16} />
-                    Import
+                    <span className="hide-text-mobile">Import</span>
                     <input 
                       type="file" 
                       accept=".json" 
