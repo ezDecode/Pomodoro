@@ -20,7 +20,7 @@ export function Timer({
   const totalCycleSeconds = calculateTotalCycleSeconds(preset)
 
   return (
-    <div className="lg:col-span-2">
+    <div className="lg:col-span-3">
       <div className="card-brutal text-center">
         <div className="mb-8">
           <div className="text-lg sm:text-xl font-normal mb-4">{sessionLabel}</div>
@@ -42,7 +42,9 @@ export function Timer({
           onSkip={onSkip}
         />
 
-        <PresetButtons onPresetSelect={onPresetSelect} />
+        <div className="mt-6">
+          <PresetButtons onPresetSelect={onPresetSelect} />
+        </div>
       </div>
     </div>
   )
