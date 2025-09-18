@@ -80,7 +80,7 @@ function App() {
           onToggleSettings={handleToggleSettings}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           <Timer
             sessionIndex={sessionIndex}
             remaining={remaining}
@@ -95,15 +95,19 @@ function App() {
           />
 
           {showSettings && (
-            <Settings
-              settings={settings}
-              onSettingsUpdate={updateSettings}
-              onImportSettings={importSettings}
-            />
+            <div className="lg:col-span-2">
+              <Settings
+                settings={settings}
+                onSettingsUpdate={updateSettings}
+                onImportSettings={importSettings}
+              />
+            </div>
           )}
 
           {showStats && (
-            <Statistics settings={settings} />
+            <div className="lg:col-span-2">
+              <Statistics settings={settings} />
+            </div>
           )}
         </div>
       </div>
