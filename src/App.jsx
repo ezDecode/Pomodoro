@@ -172,6 +172,11 @@ function App() {
         }}
       />
 
+      {/* Footer Trademark */}
+      <footer className="absolute bottom-3 left-0 right-0 z-10 text-center tracking-tight text-xl text-gray-500 select-none">
+        Made for fun with a lot of caffain &copy; <a href="https://creativesky.me" target="_blank" rel="noopener noreferrer">Sky</a>
+      </footer>
+
     </div>
   )
 }
