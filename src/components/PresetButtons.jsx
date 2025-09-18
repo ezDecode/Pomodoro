@@ -13,9 +13,6 @@ export function PresetButtons({ onPresetSelect, onAddCustomPreset, customPresets
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-normal text-center">Quick Presets</h3>
-
-      {/* Only show two presets to keep UI uncluttered */}
       <div className="grid grid-cols-2 gap-3 place-items-stretch">
         {PRESETS.slice(0, 2).map((preset) => (
           <button 
