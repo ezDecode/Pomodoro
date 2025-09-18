@@ -21,6 +21,10 @@ function App() {
     saveCustomPreset
   } = useSettings()
 
+  const handleCarryoverUsed = useCallback(() => {
+    setCarryoverBreakTime(0)
+  }, [])
+
   const handleSessionComplete = useCallback((sessionData, autoStartNext, delayNext) => {
     // Capture statistics BEFORE updating them for accurate "previous session" display
     const previousStats = {
@@ -97,10 +101,6 @@ function App() {
     setShowCompletionModal(false)
     setCompletedSessionData(null)
   }
-
-  const handleCarryoverUsed = useCallback(() => {
-    setCarryoverBreakTime(0)
-  }, [])
 
   return (
     <div className="min-h-screen w-full bg-white relative text-gray-800 p-4">
