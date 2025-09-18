@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Download, Upload, Plus, Minus, ChevronDown, ChevronUp } from 'lucide-react'
+import { Download, Upload, ChevronDown, ChevronUp } from 'lucide-react'
 import { exportSettings, importSettings, formatTime } from '../utils/helpers'
 
 export function Settings({ 
@@ -16,14 +16,6 @@ export function Settings({
     importSettings(event, onImportSettings)
   }
 
-  const handleTimeAdjust = (field, seconds) => {
-    const currentValue = preset[field]
-    const newValue = Math.max(60, currentValue + seconds) // Minimum 1 minute
-    onSettingsUpdate({
-      preset: { ...preset, [field]: newValue }
-    })
-  }
-
   const handleTimeInputChange = (field, value) => {
     const seconds = Math.max(60, Number(value) * 60) // Minimum 1 minute
     onSettingsUpdate({
@@ -31,38 +23,30 @@ export function Settings({
     })
   }
 
-  const TimeInput = ({ label, field, value, min = 1, max = 999 }) => (
-    <label className="flex flex-col gap-2">
-      <span className="font-normal">{label}</span>
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => handleTimeAdjust(field, -60)}
-          className="btn-brutal btn-neutral btn-icon-only"
-          title="Remove 1 minute"
-        >
-          <Minus size={14} />
-        </button>
-        <input 
-          className="input-brutal flex-1 text-center" 
-          type="number" 
-          min={min} 
-          max={max} 
-          value={Math.floor(value/60)} 
+  const DurationSelect = ({ label, field, value, options }) => {
+    const currentMinutes = Math.floor(value / 60)
+    const uniqueOptions = Array.from(new Set([...
+      options,
+      currentMinutes
+    ])).sort((a, b) => a - b)
+    return (
+      <label className="flex flex-col gap-2">
+        <span className="font-normal">{label}</span>
+        <select
+          className="input-brutal"
+          value={currentMinutes}
           onChange={(e) => handleTimeInputChange(field, e.target.value)}
-        />
-        <button
-          onClick={() => handleTimeAdjust(field, 60)}
-          className="btn-brutal btn-neutral btn-icon-only"
-          title="Add 1 minute"
         >
-          <Plus size={14} />
-        </button>
-      </div>
-      <div className="text-xs text-gray-500 text-center">
-        {formatTime(value)}
-      </div>
-    </label>
-  )
+          {uniqueOptions.map((m) => (
+            <option key={`${field}-${m}`} value={m}>{m} min</option>
+          ))}
+        </select>
+        <div className="text-xs text-gray-500 text-center">
+          {formatTime(value)}
+        </div>
+      </label>
+    )
+  }
 
   return (
     <div className="card-brutal">
@@ -85,59 +69,37 @@ export function Settings({
 
           {showTimes && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <TimeInput 
+            <DurationSelect 
               label="Work (min)" 
               field="work" 
               value={preset.work} 
-              min={1} 
-              max={999} 
+              options={[1,2,3,5,10,15,20,25,30,45,50,60,90,120]} 
             />
-            <TimeInput 
+            <DurationSelect 
               label="Short break (min)" 
               field="shortBreak" 
               value={preset.shortBreak} 
-              min={1} 
-              max={999} 
+              options={[1,2,3,5,10,15,20,30]} 
             />
-            <TimeInput 
+            <DurationSelect 
               label="Long break (min)" 
               field="longBreak" 
               value={preset.longBreak} 
-              min={1} 
-              max={999} 
+              options={[5,10,15,20,25,30,45,60]} 
             />
             <label className="flex flex-col gap-2">
               <span className="font-normal">Cycle (sessions)</span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => onSettingsUpdate({
-                    preset: { ...preset, cycle: Math.max(1, preset.cycle - 1) }
-                  })}
-                  className="btn-brutal btn-neutral btn-icon-only"
-                  title="Decrease cycle"
-                >
-                  <Minus size={14} />
-                </button>
-                <input 
-                  className="input-brutal flex-1 text-center" 
-                  type="number" 
-                  min={1} 
-                  max={99} 
-                  value={preset.cycle} 
-                  onChange={(e) => onSettingsUpdate({
-                    preset: { ...preset, cycle: Math.max(1, Number(e.target.value)) }
-                  })} 
-                />
-                <button
-                  onClick={() => onSettingsUpdate({
-                    preset: { ...preset, cycle: Math.min(99, preset.cycle + 1) }
-                  })}
-                  className="btn-brutal btn-neutral btn-icon-only"
-                  title="Increase cycle"
-                >
-                  <Plus size={14} />
-                </button>
-              </div>
+              <select
+                className="input-brutal"
+                value={preset.cycle}
+                onChange={(e) => onSettingsUpdate({
+                  preset: { ...preset, cycle: Math.max(1, Number(e.target.value)) }
+                })}
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).concat(preset.cycle > 12 ? [preset.cycle] : []).map((c) => (
+                  <option key={`cycle-${c}`} value={c}>{c}</option>
+                ))}
+              </select>
             </label>
           </div>
           )}
