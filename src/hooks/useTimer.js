@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { playNotificationBeep, getSessionInfo } from '../utils/helpers'
+import { startNotificationBeep, getSessionInfo } from '../utils/helpers'
 import { TIME_LIMITS } from '../utils/constants'
 
 export function useTimer(sessionIndex, settings, onSessionComplete) {
@@ -13,65 +13,97 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
   const [pauseStartTime, setPauseStartTime] = useState(null)
   const timerRef = useRef(null)
   const breakTimerRef = useRef(null)
+  const hasCompletedRef = useRef(false)
 
   // Update remaining time and baseline when session changes
   useEffect(() => {
     setRemaining(sessionDuration)
     setBaselineSeconds(sessionDuration)
     setBreakTime(0) // Reset break time for new session
+    hasCompletedRef.current = false
   }, [sessionDuration])
+
+  // Reset completion guard when explicit session index changes
+  useEffect(() => {
+    hasCompletedRef.current = false
+  }, [sessionIndex])
+
+  // Helper function to clean up timer worker
+  const cleanupTimerWorker = () => {
+    if (timerRef.current) {
+      timerRef.current.postMessage('stop')
+      timerRef.current.terminate()
+      timerRef.current = null
+    }
+  }
 
   // Main timer logic
   useEffect(() => {
-    if (!isRunning) return
-
-    timerRef.current = new Worker(
-      URL.createObjectURL(
-        new Blob([
-          `let id; onmessage=(e)=>{ if(e.data==='start'){ clearInterval(id); id=setInterval(()=>postMessage('tick'),1000); } if(e.data==='stop'){ clearInterval(id); } }`,
-        ], { type: 'text/javascript' })
-      )
-    )
-
-    const onTick = () => {
-      setRemaining((r) => {
-        if (r <= 1) {
-          // Timer completed
-          timerRef.current?.postMessage('stop')
-          timerRef.current?.terminate()
-          timerRef.current = null
-          
-          // Play notification beep
-          playNotificationBeep()
-
-          // Create session data
-          const sessionData = {
-            type: 'work', // All sessions are now work sessions
-            duration: sessionDuration,
-            breakTime: breakTime,
-            completedAt: new Date().toISOString()
-          }
-          
-          // Notify parent of session completion
-          onSessionComplete(sessionData, autoStartNext, delayNext)
-          
-          return 0
-        }
-        return r - 1
-      })
+    if (!isRunning) {
+      cleanupTimerWorker()
+      return
     }
 
-    timerRef.current.onmessage = onTick
-    timerRef.current.postMessage('start')
+    // Ensure any existing worker is cleaned up first
+    cleanupTimerWorker()
+
+    // Small delay to ensure cleanup is complete
+    const startTimer = setTimeout(() => {
+      timerRef.current = new Worker(
+        URL.createObjectURL(
+          new Blob([
+            `let id; onmessage=(e)=>{ if(e.data==='start'){ clearInterval(id); id=setInterval(()=>postMessage('tick'),1000); } if(e.data==='stop'){ clearInterval(id); } }`,
+          ], { type: 'text/javascript' })
+        )
+      )
+
+      const onTick = () => {
+        setRemaining((r) => {
+          if (r <= 1) {
+            // Prevent duplicate completion for the same session
+            if (hasCompletedRef.current) {
+              return 0
+            }
+            hasCompletedRef.current = true
+
+            // Timer completed
+            cleanupTimerWorker()
+            setIsRunning(false)
+
+            // Play notification beep once
+            startNotificationBeep(200)
+
+            // Create session data
+            const sessionData = {
+              type: 'work', // All sessions are now work sessions
+              duration: sessionDuration,
+              breakTime: breakTime,
+              completedAt: new Date().toISOString()
+            }
+            
+            // Notify parent of session completion
+            onSessionComplete(sessionData, autoStartNext, delayNext)
+            
+            return 0
+          }
+          return r - 1
+        })
+      }
+
+      timerRef.current.onmessage = onTick
+      timerRef.current.postMessage('start')
+    }, 10) // Small delay to ensure cleanup
 
     return () => {
-      timerRef.current?.postMessage('stop')
-      timerRef.current?.terminate()
-      timerRef.current = null
+      clearTimeout(startTimer)
+      cleanupTimerWorker()
     }
-  }, [isRunning, autoStartNext, delayNext, sessionDuration, isWork, onSessionComplete])
+  }, [isRunning, autoStartNext, delayNext, sessionDuration, isWork, onSessionComplete, breakTime])
 
   const startTimer = () => {
+    // Ensure any existing timer worker is cleaned up first
+    cleanupTimerWorker()
+    
     // If resuming from pause, stop break time tracking
     if (pauseStartTime) {
       const pauseDuration = Math.floor((Date.now() - pauseStartTime) / 1000)
@@ -90,6 +122,8 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
   }
   
   const pauseTimer = () => {
+    // Clean up main timer first
+    cleanupTimerWorker()
     setIsRunning(false)
     setPauseStartTime(Date.now())
     
@@ -110,6 +144,8 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
   }
   
   const resetTimer = () => {
+    // Clean up both timers
+    cleanupTimerWorker()
     setIsRunning(false)
     setRemaining(sessionDuration)
     setBaselineSeconds(sessionDuration)
@@ -150,6 +186,9 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
     
     // Reset break time when manually adjusting time (fresh start)
     if (safeTime !== remaining) {
+      // Clean up any running timers to prevent conflicts
+      cleanupTimerWorker()
+      
       setBreakTime(0)
       setPauseStartTime(null)
       

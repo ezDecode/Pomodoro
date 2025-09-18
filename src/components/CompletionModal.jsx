@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { X, CheckCircle } from 'lucide-react'
-import { formatTime, playNotificationBeep } from '../utils/helpers'
+import { formatTime, stopNotificationBeep } from '../utils/helpers'
 
 export function CompletionModal({ 
   isOpen, 
@@ -8,10 +8,11 @@ export function CompletionModal({
   sessionData,
   totalStats
 }) {
-  // Play beep sound when modal opens
+  // Ensure any ongoing beep is stopped when modal closes/unmounts
   useEffect(() => {
-    if (isOpen) {
-      playNotificationBeep()
+    if (!isOpen) return
+    return () => {
+      stopNotificationBeep()
     }
   }, [isOpen])
 
@@ -28,7 +29,7 @@ export function CompletionModal({
             <h2 className="text-2xl font-normal">Session Complete!</h2>
           </div>
           <button
-            onClick={onClose}
+            onClick={() => { stopNotificationBeep(); onClose() }}
             className="btn-brutal btn-icon-only"
             title="Close"
           >

@@ -1,20 +1,18 @@
 import { useMemo, useState } from 'react'
 import { formatTime } from '../utils/helpers'
-import { ChevronDown, ChevronUp, Filter } from 'lucide-react'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 
 export function Statistics({ settings }) {
   const { completedSessions, totalWorkTime, totalBreakTime, pauseCount, sessionHistory } = settings
 
   const [isSummaryOpen, setIsSummaryOpen] = useState(true)
   const [isHistoryOpen, setIsHistoryOpen] = useState(true)
-  const [typeFilter, setTypeFilter] = useState('all')
-  const [limit, setLimit] = useState(10)
+  const DEFAULT_LIMIT = 10
 
-  const filteredHistory = useMemo(() => {
+  const recentHistory = useMemo(() => {
     const base = Array.isArray(sessionHistory) ? sessionHistory : []
-    const filtered = typeFilter === 'all' ? base : base.filter(s => s.type === typeFilter)
-    return filtered.slice(-limit).reverse()
-  }, [sessionHistory, typeFilter, limit])
+    return base.slice(-DEFAULT_LIMIT).reverse()
+  }, [sessionHistory])
 
   return (
     <div className="card-brutal">
@@ -68,39 +66,11 @@ export function Statistics({ settings }) {
               <h3 className="text-base font-medium">Recent sessions</h3>
               {isHistoryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
-
-            {/* Filters */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-1 text-sm text-gray-600">
-                <Filter size={14} />
-                <span>Filter:</span>
-              </div>
-              <select
-                className="input-brutal text-sm py-1 px-2 h-8 min-w-0"
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                title="Filter by type"
-              >
-                <option value="all">All</option>
-                <option value="work">Work</option>
-              </select>
-              <select
-                className="input-brutal text-sm py-1 px-2 h-8 min-w-0"
-                value={limit}
-                onChange={(e) => setLimit(Number(e.target.value))}
-                title="Limit entries"
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-            </div>
           </div>
 
-          {isHistoryOpen && filteredHistory.length > 0 && (
+          {isHistoryOpen && recentHistory.length > 0 && (
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {filteredHistory.map((session, index) => (
+              {recentHistory.map((session, index) => (
                 <div key={index} className="flex justify-between items-center p-2 border-2 border-black bg-gray-100">
                   <span className="font-normal text-sm capitalize">{session.type}</span>
                   <span className="font-normal text-sm">{formatTime(session.duration)}</span>
@@ -108,7 +78,7 @@ export function Statistics({ settings }) {
               ))}
             </div>
           )}
-          {isHistoryOpen && filteredHistory.length === 0 && (
+          {isHistoryOpen && recentHistory.length === 0 && (
             <div className="text-sm text-gray-500">No sessions yet.</div>
           )}
         </section>

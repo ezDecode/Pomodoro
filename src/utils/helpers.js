@@ -6,19 +6,52 @@ export function formatTime(totalSeconds) {
   return `${hh}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
-export function playNotificationBeep() {
+// Simple controllable notification beep
+let __beepCtx = null
+let __beepOsc = null
+let __beepGain = null
+
+export function startNotificationBeep(durationMs = 200) {
+  stopNotificationBeep()
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)()
-    const o = ctx.createOscillator()
-    const g = ctx.createGain()
-    o.type = 'square'
-    o.frequency.value = 880
-    g.gain.value = 1.0 // Use system volume (max volume, system will control)
-    o.connect(g)
-    g.connect(ctx.destination)
-    o.start()
-    setTimeout(() => { o.stop(); ctx.close() }, 200)
+    __beepCtx = new (window.AudioContext || window.webkitAudioContext)()
+    __beepOsc = __beepCtx.createOscillator()
+    __beepGain = __beepCtx.createGain()
+    __beepOsc.type = 'square'
+    __beepOsc.frequency.value = 880
+    __beepGain.gain.value = 1.0
+    __beepOsc.connect(__beepGain)
+    __beepGain.connect(__beepCtx.destination)
+    __beepOsc.start()
+    if (durationMs && durationMs > 0) {
+      setTimeout(() => {
+        stopNotificationBeep()
+      }, durationMs)
+    }
+  } catch {
+    // Ignore audio errors
+  }
+}
+
+export function stopNotificationBeep() {
+  try {
+    if (__beepOsc) {
+      __beepOsc.stop()
+    }
   } catch {}
+  try {
+    if (__beepCtx) {
+      __beepCtx.close()
+    }
+  } catch {}
+  __beepOsc = null
+  __beepGain = null
+  __beepCtx = null
+}
+
+// Backward compatibility: legacy named export used before refactor
+export function playNotificationBeep() {
+  startNotificationBeep(200)
 }
 
 export function calculateTotalCycleSeconds(preset) {
