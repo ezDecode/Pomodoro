@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, memo, useCallback } from 'react'
 import { X, Plus, Minus } from 'lucide-react'
 import { formatTime } from '../utils/helpers'
 
-export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] }) {
+export const CustomPresetModal = memo(function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] }) {
   const [formData, setFormData] = useState({
     name: '',
     work: 25,
@@ -11,7 +11,7 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
     cycle: 4
   })
 
-  const handleSubmit = (e) => {
+  const handleSubmit = useCallback((e) => {
     e.preventDefault()
     if (formData.name.trim()) {
       onSave({
@@ -24,20 +24,20 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
       setFormData({ name: '', work: 25, shortBreak: 5, longBreak: 15, cycle: 4 })
       onClose()
     }
-  }
+  }, [formData, onSave, onClose])
 
-  const handleDelete = (presetName) => {
+  const handleDelete = useCallback((presetName) => {
     if (confirm(`Delete preset "${presetName}"?`)) {
       onSave(null, presetName) // null means delete, second param is the name to delete
     }
-  }
+  }, [onSave])
 
-  const handleTimeAdjust = (field, minutes) => {
+  const handleTimeAdjust = useCallback((field, minutes) => {
     setFormData(prev => ({
       ...prev,
       [field]: Math.max(1, prev[field] + minutes)
     }))
-  }
+  }, [])
 
   const TimeInput = ({ label, field, value, min = 1, max = 999 }) => (
     <label className="flex flex-col gap-2">
@@ -75,16 +75,17 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative card-brutal w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
+      <div className="relative card-brutal w-full max-w-2xl max-h-[90vh] sm:max-h-[80vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-normal">Custom Presets</h2>
+          <h2 id="modal-title" className="text-xl sm:text-2xl font-normal">Custom Presets</h2>
           <button 
             onClick={onClose}
             className="btn-brutal btn-neutral btn-icon-only"
-            title="Close"
+            title="Close modal"
+            aria-label="Close modal"
           >
             <X size={16} />
           </button>
@@ -201,4 +202,4 @@ export function CustomPresetModal({ isOpen, onClose, onSave, customPresets = [] 
       </div>
     </div>
   )
-}
+})

@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, memo, useMemo } from 'react'
 import { Plus, Minus } from 'lucide-react'
 import { formatTime, calculateTotalCycleSeconds, getSessionInfo, validateTimeInput } from '../utils/helpers'
 import { ProgressBar } from './ProgressBar'
 import { TimerControls } from './TimerControls'
 import { PresetButtons } from './PresetButtons'
 
-export function Timer({ 
+const Timer = memo(function Timer({ 
   sessionIndex,
   remaining,
   isRunning,
@@ -22,11 +22,23 @@ export function Timer({
   onSettingsUpdate
 }) {
   const { preset } = settings
-  const { sessionLabel } = getSessionInfo(sessionIndex, preset)
-  const totalCycleSeconds = calculateTotalCycleSeconds(preset)
+  
+  // Memoize expensive calculations
+  const sessionInfo = useMemo(() => 
+    getSessionInfo(sessionIndex, preset), 
+    [sessionIndex, preset]
+  )
+  
+  const totalCycleSeconds = useMemo(() => 
+    calculateTotalCycleSeconds(preset), 
+    [preset]
+  )
+  
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
   const [validationError, setValidationError] = useState('')
+  
+  const { sessionLabel } = sessionInfo
 
   const handleTimerClick = () => {
     if (!isRunning) {
@@ -84,10 +96,10 @@ export function Timer({
   return (
     <div className="lg:col-span-1">
       <div className="card-brutal text-center">
-        <div className="mb-8">
-          <div className="text-lg sm:text-xl font-normal mb-4">{sessionLabel}</div>
+        <div className="mb-6 sm:mb-8">
+          <div className="text-base sm:text-lg md:text-xl font-normal mb-3 sm:mb-4">{sessionLabel}</div>
           <div 
-            className="timer-display mb-4 text-6xl sm:text-7xl md:text-8xl font-light tracking-tight cursor-pointer hover:bg-gray-50 transition-colors rounded-lg p-2"
+            className="timer-display mb-3 sm:mb-4 text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight cursor-pointer hover:bg-gray-50 active:bg-gray-100 transition-colors rounded-lg p-2 select-none"
             onClick={handleTimerClick}
             title={!isRunning ? "Click to edit time" : "Stop timer to edit"}
           >
@@ -99,7 +111,7 @@ export function Timer({
                   onChange={handleTimeEdit}
                   onBlur={handleTimeSubmit}
                   onKeyDown={handleKeyPress}
-                  className={`bg-transparent border-none outline-none text-center w-full text-6xl sm:text-7xl md:text-8xl font-light tracking-tight ${
+                  className={`bg-transparent border-none outline-none text-center w-full text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light tracking-tight ${
                     validationError ? 'text-red-500' : ''
                   }`}
                   autoFocus
@@ -118,48 +130,53 @@ export function Timer({
           
           {/* Quick Time Adjustment Buttons */}
           {!isRunning && !isEditing && (
-            <div className="flex justify-center gap-2 mb-4">
+            <div className="flex justify-center gap-2 sm:gap-3 mb-4 flex-wrap">
               <button
                 onClick={() => handleQuickAdjust(-60)}
                 className="btn-brutal btn-neutral btn-icon-only"
                 title="Remove 1 minute"
+                aria-label="Remove 1 minute"
               >
-                <Minus size={16} />
+                <Minus size={18} />
               </button>
               <button
                 onClick={() => handleQuickAdjust(-300)}
                 className="btn-brutal btn-neutral btn-icon-only"
                 title="Remove 5 minutes"
+                aria-label="Remove 5 minutes"
               >
-                <Minus size={16} />
-                <span className="text-xs ml-1">5</span>
+                <Minus size={18} />
+                <span className="text-xs ml-1 hidden sm:inline">5</span>
               </button>
               <button
                 onClick={() => handleQuickAdjust(300)}
                 className="btn-brutal btn-neutral btn-icon-only"
                 title="Add 5 minutes"
+                aria-label="Add 5 minutes"
               >
-                <Plus size={16} />
-                <span className="text-xs ml-1">5</span>
+                <Plus size={18} />
+                <span className="text-xs ml-1 hidden sm:inline">5</span>
               </button>
               <button
                 onClick={() => handleQuickAdjust(60)}
                 className="btn-brutal btn-neutral btn-icon-only"
                 title="Add 1 minute"
+                aria-label="Add 1 minute"
               >
-                <Plus size={16} />
+                <Plus size={18} />
               </button>
             </div>
           )}
           
-          <div className="text-base sm:text-lg font-normal flex items-center justify-center gap-6">
-            <span>Cycle total: {formatTime(totalCycleSeconds)}</span>
-            <label className="flex items-center gap-2 cursor-pointer">
+          <div className="text-sm sm:text-base md:text-lg font-normal flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mobile-stack">
+            <span className="text-center">Cycle total: {formatTime(totalCycleSeconds)}</span>
+            <label className="flex items-center gap-2 cursor-pointer touch-target">
               <input 
                 type="checkbox" 
                 checked={settings.autoStartNext} 
                 onChange={(e) => onSettingsUpdate({ autoStartNext: e.target.checked })}
-                className="w-4 h-4"
+                className="w-5 h-5 sm:w-4 sm:h-4"
+                aria-describedby="auto-start-help"
               />
               <span>Auto-start next</span>
             </label>
@@ -184,4 +201,6 @@ export function Timer({
       </div>
     </div>
   )
-}
+})
+
+export { Timer }

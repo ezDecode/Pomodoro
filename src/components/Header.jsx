@@ -5,21 +5,27 @@ export function Header({
   onToggleStats
 }) {
   return (
-    <div className="flex items-center justify-between mb-8">
-      <div>
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-medium tracking-tight">Pomodoro</h1>
-        <p className="text-base sm:text-lg md:text-xl font-normal">Ultra-flexible timer</p>
+    <header className="flex items-center justify-between mb-6 sm:mb-8" role="banner">
+      <div className="flex-1 min-w-0">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight truncate">
+          Pomodoro
+        </h1>
+        <p className="text-sm sm:text-base md:text-lg lg:text-xl font-normal text-gray-600 truncate">
+          Ultra-flexible timer
+        </p>
       </div>
-      <div className="flex gap-4">
+      <div className="flex gap-3 sm:gap-4 ml-4">
         <button 
-          className="btn-brutal btn-secondary flex items-center gap-2 sm:gap-2 btn-icon-only"
+          className="btn-brutal btn-secondary flex items-center gap-2 btn-icon-only"
           onClick={onToggleStats}
-          title="Statistics"
+          title={showStats ? "Hide Statistics" : "Show Statistics"}
+          aria-label={showStats ? "Hide Statistics" : "Show Statistics"}
+          aria-expanded={showStats}
         >
           <BarChart3 size={20} />
           <span className="hide-text-mobile">Stats</span>
         </button>
       </div>
-    </div>
+    </header>
   )
 }

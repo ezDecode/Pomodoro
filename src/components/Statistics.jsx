@@ -34,20 +34,20 @@ export function Statistics({ settings }) {
             {isSummaryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
           {isSummaryOpen && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center">
-                  <div className="text-3xl font-light text-red-500">{completedSessions}</div>
-                  <div className="text-sm font-normal">Sessions</div>
+            <div className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="text-center p-3 rounded-lg bg-gray-50">
+                  <div className="text-2xl sm:text-3xl font-light text-red-500">{completedSessions}</div>
+                  <div className="text-xs sm:text-sm font-normal">Sessions</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-light text-blue-500">{formatTime(totalWorkTime)}</div>
-                  <div className="text-sm font-normal">Work time</div>
+                <div className="text-center p-3 rounded-lg bg-gray-50">
+                  <div className="text-2xl sm:text-3xl font-light text-blue-500">{formatTime(totalWorkTime)}</div>
+                  <div className="text-xs sm:text-sm font-normal">Work time</div>
                 </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-light text-green-500">{formatTime(totalBreakTime)}</div>
-                <div className="text-sm font-normal">Break time</div>
+              <div className="text-center p-3 rounded-lg bg-gray-50">
+                <div className="text-2xl sm:text-3xl font-light text-green-500">{formatTime(totalBreakTime)}</div>
+                <div className="text-xs sm:text-sm font-normal">Break time</div>
               </div>
             </div>
           )}
@@ -66,26 +66,28 @@ export function Statistics({ settings }) {
             </button>
 
             {/* Filters */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-1 text-sm text-gray-600">
+            <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-end">
+              <div className="flex items-center gap-1 text-xs sm:text-sm text-gray-600">
                 <Filter size={14} />
-                <span>Filter:</span>
+                <span className="hidden sm:inline">Filter:</span>
               </div>
               <select
-                className="input-brutal text-sm py-1 px-2 h-8 min-w-0"
+                className="input-brutal text-xs sm:text-sm py-1 px-2 h-9 min-w-0"
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
-                title="Filter by type"
+                title="Filter by session type"
+                aria-label="Filter by session type"
               >
                 <option value="all">All</option>
                 <option value="work">Work</option>
                 <option value="break">Break</option>
               </select>
               <select
-                className="input-brutal text-sm py-1 px-2 h-8 min-w-0"
+                className="input-brutal text-xs sm:text-sm py-1 px-2 h-9 min-w-0"
                 value={limit}
                 onChange={(e) => setLimit(Number(e.target.value))}
-                title="Limit entries"
+                title="Number of entries to show"
+                aria-label="Number of entries to show"
               >
                 <option value={5}>5</option>
                 <option value={10}>10</option>

@@ -27,6 +27,27 @@ body {
   font-family: "Inter Tight", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   background: rgb(var(--color-bg));
   color: rgb(var(--color-fg));
+  /* Performance optimizations */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Performance utilities */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Smooth transitions for layout changes */
+.layout-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Touch target optimization */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
 }
 
 /* Neo-brutalist button styles */
@@ -34,6 +55,9 @@ body {
   @apply border-2 border-black bg-white text-black font-normal px-6 py-3 text-lg;
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
   transition: all 0.1s ease;
+  /* Performance optimization */
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
 }
 
 .btn-brutal:hover {
@@ -97,36 +121,93 @@ body {
 .progress-brutal {
   @apply border-2 border-black bg-gray-200 h-8;
   box-shadow: 2px 2px 0px 0px rgb(0,0,0);
+  /* Performance optimization */
+  contain: layout style;
 }
 
 .progress-fill {
   @apply h-full bg-red-500;
   transition: width 0.3s ease;
+  /* Performance optimization */
+  will-change: width;
+  backface-visibility: hidden;
 }
 
-/* Responsive utilities for cleaner mobile design */
+/* Enhanced responsive utilities for maximum mobile optimization */
 @media (max-width: 640px) {
   .hide-text-mobile {
-    font-size: 0;
-    line-height: 0;
-    width: 0;
-    overflow: hidden;
+    display: none !important;
   }
   
   .btn-icon-only {
-    padding: 0.75rem;
-    min-width: 3rem;
+    padding: 0.875rem;
+    min-width: 3.5rem;
+    min-height: 3.5rem;
     justify-content: center;
-  }
-  
-  .btn-icon-only .hide-text-mobile {
-    display: none;
+    align-items: center;
   }
   
   .preset-compact {
-    padding: 0.5rem 0.75rem;
+    padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
     min-width: auto;
+    min-height: 2.75rem;
+  }
+  
+  /* Improve touch targets */
+  button, input, select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Optimize timer display for mobile */
+  .timer-display {
+    font-size: 4rem !important;
+    line-height: 1.1;
+    padding: 1rem 0.5rem;
+  }
+  
+  /* Better spacing for mobile */
+  .card-brutal {
+    padding: 1.25rem;
+    margin: 0.75rem;
+  }
+  
+  /* Improved mobile layout */
+  .mobile-stack {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .timer-display {
+    font-size: 3.5rem !important;
+  }
+  
+  .card-brutal {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+  
+  /* Ultra-compact for very small screens */
+  .btn-icon-only {
+    padding: 0.75rem;
+    min-width: 3rem;
+    min-height: 3rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Tablet optimizations */
+  .timer-display {
+    font-size: 5rem !important;
+  }
+  
+  .btn-icon-only {
+    padding: 1rem;
+    min-width: 4rem;
+    min-height: 4rem;
   }
 }
 

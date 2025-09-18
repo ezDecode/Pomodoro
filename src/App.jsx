@@ -63,10 +63,10 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-white relative text-gray-800 p-4">
+    <div className="min-h-screen w-full bg-white relative text-gray-800 p-2 sm:p-4">
       {/* Crosshatch Art - Light Pattern */}
       <div
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="absolute inset-0 z-0 pointer-events-none opacity-80 sm:opacity-100"
         style={{
           backgroundImage: `
         repeating-linear-gradient(22.5deg, transparent, transparent 2px, rgba(75, 85, 99, 0.06) 2px, rgba(75, 85, 99, 0.06) 3px, transparent 3px, transparent 8px),
@@ -75,16 +75,17 @@ function App() {
         repeating-linear-gradient(157.5deg, transparent, transparent 2px, rgba(31, 41, 55, 0.03) 2px, rgba(31, 41, 55, 0.03) 3px, transparent 3px, transparent 8px)
       `,
         }}
+        aria-hidden="true"
       />
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10">
         <Header
           showStats={showStats}
           onToggleStats={handleToggleStats}
         />
 
-        <div className={`grid grid-cols-1 gap-8 ${showStats ? 'lg:grid-cols-2' : ''}`}>
+        <main className={`grid grid-cols-1 gap-4 sm:gap-6 lg:gap-8 ${showStats ? 'lg:grid-cols-2' : ''} transition-all duration-300 ease-in-out`}>
           <Timer
             sessionIndex={sessionIndex}
             remaining={remaining}
@@ -102,17 +103,10 @@ function App() {
             onSettingsUpdate={updateSettings}
           />
 
-          {/* {showSettings && (
-            <Settings
-              settings={settings}
-              onSettingsUpdate={updateSettings}
-            />
-          )} */}
-
           {showStats && (
             <Statistics settings={settings} />
           )}
-        </div>
+        </main>
       </div>
 
       {/* Custom Preset Modal */}
