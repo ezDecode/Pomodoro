@@ -158,7 +158,7 @@ export function Timer({
             )}
           </div>
           
-          {/* Quick Time Adjustment Buttons */}
+          {/* Quick Time Adjustment Buttons - Hidden when timer is running */}
           {!isRunning && !isEditing && (
             <div className="space-y-2 mb-4">
               <div className="flex justify-center gap-2">
@@ -241,11 +241,14 @@ export function Timer({
           onSkip={onSkip}
         />
 
-        <PresetButtons 
-          onPresetSelect={onPresetSelect}
-          onAddCustomPreset={onAddCustomPreset}
-          customPresets={customPresets}
-        />
+        {/* Preset Buttons - Hidden when timer is running */}
+        {!isRunning && (
+          <PresetButtons 
+            onPresetSelect={onPresetSelect}
+            onAddCustomPreset={onAddCustomPreset}
+            customPresets={customPresets}
+          />
+        )}
       </div>
     </div>
   )

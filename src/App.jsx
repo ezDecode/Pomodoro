@@ -83,6 +83,14 @@ function App() {
     pauseTimer()
   }, [pauseTimer])
 
+  const handleReset = useCallback(() => {
+    resetTimer()
+    // Automatically start the timer after reset
+    setTimeout(() => {
+      startTimer()
+    }, 50) // Small delay to ensure reset completes
+  }, [resetTimer, startTimer])
+
   const handleToggleStats = () => {
     setShowStats((prev) => !prev)
   }
@@ -137,7 +145,7 @@ function App() {
               customPresets={customPresets}
               onStart={startTimer}
               onPause={handlePause}
-              onReset={resetTimer}
+              onReset={handleReset}
               onSkip={handleSkip}
               onPresetSelect={updatePreset}
               onAddCustomPreset={handleAddCustomPreset}
