@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Download, Upload, Plus, Minus } from 'lucide-react'
+import { Download, Upload, Plus, Minus, ChevronDown, ChevronUp } from 'lucide-react'
 import { exportSettings, importSettings, formatTime } from '../utils/helpers'
 
 export function Settings({ 
@@ -9,6 +9,8 @@ export function Settings({
 }) {
   const { preset, autoStartNext, delayNext, volume } = settings
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [showTimes, setShowTimes] = useState(true)
+  const [showBehavior, setShowBehavior] = useState(true)
 
   const handleImportSettings = (event) => {
     importSettings(event, onImportSettings)
@@ -69,10 +71,19 @@ export function Settings({
         <p className="text-sm text-gray-600 mt-1">Tune your focus and break durations. Advanced options are tucked away.</p>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Focus & Breaks */}
         <section>
-          <h3 className="text-base font-medium mb-4">Focus & Breaks</h3>
+          <button
+            className="w-full flex items-center justify-between text-left mb-2"
+            onClick={() => setShowTimes((v) => !v)}
+            title="Toggle Focus & Breaks"
+          >
+            <h3 className="text-base font-medium">Focus & Breaks</h3>
+            {showTimes ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+
+          {showTimes && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TimeInput 
               label="Work (min)" 
@@ -129,11 +140,21 @@ export function Settings({
               </div>
             </label>
           </div>
+          )}
         </section>
 
         {/* Behavior */}
         <section>
-          <h3 className="text-base font-medium mb-4">Behavior</h3>
+          <button
+            className="w-full flex items-center justify-between text-left mb-2"
+            onClick={() => setShowBehavior((v) => !v)}
+            title="Toggle Behavior"
+          >
+            <h3 className="text-base font-medium">Behavior</h3>
+            {showBehavior ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+
+          {showBehavior && (
           <div className="grid grid-cols-1 gap-4">
             <label className="flex items-center justify-between gap-4">
               <span className="font-normal">Auto-start next</span>
@@ -158,20 +179,22 @@ export function Settings({
               />
             </label>
           </div>
+          )}
         </section>
 
-        {/* Advanced toggle */}
+        {/* Advanced & Data */}
         <section>
           <button
-            className="btn-brutal btn-neutral text-sm"
+            className="w-full flex items-center justify-between text-left mb-2"
             onClick={() => setShowAdvanced((v) => !v)}
-            title="Toggle advanced options"
+            title="Toggle Advanced & Data"
           >
-            {showAdvanced ? 'Hide advanced' : 'Show advanced'}
+            <h3 className="text-base font-medium">Advanced & Data</h3>
+            {showAdvanced ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
           {showAdvanced && (
-            <div className="mt-4 space-y-4">
+            <div className="space-y-4">
               <label className="flex items-center justify-between gap-4">
                 <span className="font-normal">Delay before next (sec)</span>
                 <input 
