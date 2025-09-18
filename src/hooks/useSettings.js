@@ -34,13 +34,16 @@ export function useSettings() {
     setSettings(prev => ({
       ...prev,
       completedSessions: prev.completedSessions + 1,
-      totalWorkTime: sessionData.type === 'work' 
-        ? prev.totalWorkTime + sessionData.duration 
-        : prev.totalWorkTime,
-      totalBreakTime: sessionData.type === 'break' 
-        ? prev.totalBreakTime + sessionData.duration 
-        : prev.totalBreakTime,
+      totalWorkTime: prev.totalWorkTime + sessionData.duration,
+      totalBreakTime: prev.totalBreakTime + sessionData.breakTime, // Add break time from session
       sessionHistory: [...prev.sessionHistory.slice(-99), sessionData] // Keep last 100 sessions
+    }))
+  }
+
+  const incrementPauseCount = () => {
+    setSettings(prev => ({
+      ...prev,
+      pauseCount: (prev.pauseCount || 0) + 1
     }))
   }
 
@@ -75,6 +78,7 @@ export function useSettings() {
     updateSettings,
     updatePreset,
     addSessionToHistory,
+    incrementPauseCount,
     importSettings,
     saveCustomPreset
   }

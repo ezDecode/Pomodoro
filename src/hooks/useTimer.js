@@ -8,12 +8,16 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
   const [remaining, setRemaining] = useState(sessionDuration)
   const [baselineSeconds, setBaselineSeconds] = useState(sessionDuration)
   const [isRunning, setIsRunning] = useState(false)
+  const [breakTime, setBreakTime] = useState(0)
+  const [pauseStartTime, setPauseStartTime] = useState(null)
   const timerRef = useRef(null)
+  const breakTimerRef = useRef(null)
 
   // Update remaining time and baseline when session changes
   useEffect(() => {
     setRemaining(sessionDuration)
     setBaselineSeconds(sessionDuration)
+    setBreakTime(0) // Reset break time for new session
   }, [sessionDuration])
 
   // Main timer logic
@@ -41,8 +45,9 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
 
           // Create session data
           const sessionData = {
-            type: isWork ? 'work' : 'break',
+            type: 'work', // All sessions are now work sessions
             duration: sessionDuration,
+            breakTime: breakTime,
             completedAt: new Date().toISOString()
           }
           
@@ -65,12 +70,57 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
     }
   }, [isRunning, autoStartNext, delayNext, sessionDuration, isWork, onSessionComplete])
 
-  const startTimer = () => setIsRunning(true)
-  const pauseTimer = () => setIsRunning(false)
+  const startTimer = () => {
+    // If resuming from pause, stop break time tracking
+    if (pauseStartTime) {
+      const pauseDuration = Math.floor((Date.now() - pauseStartTime) / 1000)
+      setBreakTime(prev => prev + pauseDuration)
+      setPauseStartTime(null)
+    }
+    
+    // Stop break timer if running
+    if (breakTimerRef.current) {
+      breakTimerRef.current.postMessage('stop')
+      breakTimerRef.current.terminate()
+      breakTimerRef.current = null
+    }
+    
+    setIsRunning(true)
+  }
+  
+  const pauseTimer = () => {
+    setIsRunning(false)
+    setPauseStartTime(Date.now())
+    
+    // Start break time tracking
+    breakTimerRef.current = new Worker(
+      URL.createObjectURL(
+        new Blob([
+          `let id; onmessage=(e)=>{ if(e.data==='start'){ clearInterval(id); id=setInterval(()=>postMessage('tick'),1000); } if(e.data==='stop'){ clearInterval(id); } }`,
+        ], { type: 'text/javascript' })
+      )
+    )
+    
+    breakTimerRef.current.onmessage = () => {
+      setBreakTime(prev => prev + 1)
+    }
+    
+    breakTimerRef.current.postMessage('start')
+  }
+  
   const resetTimer = () => {
     setIsRunning(false)
     setRemaining(sessionDuration)
     setBaselineSeconds(sessionDuration)
+    setBreakTime(0)
+    setPauseStartTime(null)
+    
+    // Stop break timer if running
+    if (breakTimerRef.current) {
+      breakTimerRef.current.postMessage('stop')
+      breakTimerRef.current.terminate()
+      breakTimerRef.current = null
+    }
   }
 
   const progressBase = baselineSeconds > 0 ? baselineSeconds : sessionDuration
@@ -87,6 +137,7 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
     remaining,
     isRunning,
     progress,
+    breakTime,
     startTimer,
     pauseTimer,
     resetTimer,

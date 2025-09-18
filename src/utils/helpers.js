@@ -22,14 +22,16 @@ export function playNotificationBeep() {
 }
 
 export function calculateTotalCycleSeconds(preset) {
-  return preset.work * preset.cycle + preset.shortBreak * (preset.cycle - 1) + preset.longBreak
+  // Since we removed breaks, cycle is just work sessions
+  return preset.work * preset.cycle
 }
 
 export function getSessionInfo(sessionIndex, preset) {
-  const isWork = sessionIndex % 2 === 0
-  const isLongBreak = !isWork && ((sessionIndex + 1) % (preset.cycle * 2) === 0)
-  const sessionLabel = isWork ? 'Work' : isLongBreak ? 'Long break' : 'Short break'
-  const sessionDuration = isWork ? preset.work : isLongBreak ? preset.longBreak : preset.shortBreak
+  // All sessions are now work sessions
+  const isWork = true
+  const isLongBreak = false
+  const sessionLabel = `Work Session ${Math.floor(sessionIndex) + 1}`
+  const sessionDuration = preset.work
   
   return { isWork, isLongBreak, sessionLabel, sessionDuration }
 }

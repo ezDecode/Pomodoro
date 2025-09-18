@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Header, Timer, Statistics, CustomPresetModal } from './components'
+import { Header, Timer, Statistics, CustomPresetModal, CompletionModal } from './components'
 import { useSettings } from './hooks/useSettings'
 import { useTimer } from './hooks/useTimer'
 
@@ -7,18 +7,23 @@ function App() {
   const [sessionIndex, setSessionIndex] = useState(0)
   const [showStats, setShowStats] = useState(false)
   const [showPresetModal, setShowPresetModal] = useState(false)
+  const [showCompletionModal, setShowCompletionModal] = useState(false)
+  const [completedSessionData, setCompletedSessionData] = useState(null)
 
   const { 
     settings, 
     customPresets,
     updateSettings, 
     updatePreset, 
-    addSessionToHistory, 
+    addSessionToHistory,
+    incrementPauseCount,
     saveCustomPreset
   } = useSettings()
 
   const handleSessionComplete = useCallback((sessionData, autoStartNext, delayNext) => {
     addSessionToHistory(sessionData)
+    setCompletedSessionData(sessionData)
+    setShowCompletionModal(true)
     
     if (autoStartNext) {
       setTimeout(() => {
@@ -30,7 +35,8 @@ function App() {
   const { 
     remaining, 
     isRunning, 
-    progress, 
+    progress,
+    breakTime,
     startTimer, 
     pauseTimer, 
     resetTimer,
@@ -42,6 +48,11 @@ function App() {
     pauseTimer()
     setRemainingManual(newTime)
   }, [pauseTimer, setRemainingManual])
+
+  const handlePause = useCallback(() => {
+    pauseTimer()
+    incrementPauseCount()
+  }, [pauseTimer, incrementPauseCount])
 
   const handleSkip = () => {
     setSessionIndex((i) => i + 1)
@@ -60,6 +71,11 @@ function App() {
 
   const handleSaveCustomPreset = (preset, deleteName) => {
     saveCustomPreset(preset, deleteName)
+  }
+
+  const handleCloseCompletionModal = () => {
+    setShowCompletionModal(false)
+    setCompletedSessionData(null)
   }
 
   return (
@@ -93,7 +109,7 @@ function App() {
             settings={settings}
             customPresets={customPresets}
             onStart={startTimer}
-            onPause={pauseTimer}
+            onPause={handlePause}
             onReset={resetTimer}
             onSkip={handleSkip}
             onPresetSelect={updatePreset}
@@ -114,6 +130,18 @@ function App() {
         onClose={() => setShowPresetModal(false)}
         onSave={handleSaveCustomPreset}
         customPresets={customPresets}
+      />
+
+      {/* Session Completion Modal */}
+      <CompletionModal
+        isOpen={showCompletionModal}
+        onClose={handleCloseCompletionModal}
+        sessionData={completedSessionData}
+        totalStats={{
+          completedSessions: settings.completedSessions,
+          pauseCount: settings.pauseCount,
+          totalBreakTime: settings.totalBreakTime
+        }}
       />
     </div>
   )
