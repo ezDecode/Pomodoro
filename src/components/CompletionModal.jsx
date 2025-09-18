@@ -21,8 +21,7 @@ export function CompletionModal({
   const { completedSessions, pauseCount, totalBreakTime } = totalStats
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="card-brutal max-w-lg w-full">
+    <div className="card-brutal max-w-lg w-full mx-auto mb-8">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
             <CheckCircle className="text-green-500" size={32} />
@@ -80,7 +79,6 @@ export function CompletionModal({
             Continue
           </button>
         </div>
-      </div>
     </div>
   )
 }

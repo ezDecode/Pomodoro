@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import { startNotificationBeep, getSessionInfo } from '../utils/helpers'
 import { TIME_LIMITS } from '../utils/constants'
 
-export function useTimer(sessionIndex, settings, onSessionComplete) {
+export function useTimer(sessionIndex, settings, onSessionComplete, carryoverBreakTime = 0, onCarryoverUsed) {
   const { preset, autoStartNext, delayNext } = settings
   const { sessionDuration, isWork } = getSessionInfo(sessionIndex, preset)
+  const totalSessionDuration = sessionDuration + carryoverBreakTime
   
-  const [remaining, setRemaining] = useState(sessionDuration)
-  const [baselineSeconds, setBaselineSeconds] = useState(sessionDuration)
+  const [remaining, setRemaining] = useState(totalSessionDuration)
+  const [baselineSeconds, setBaselineSeconds] = useState(totalSessionDuration)
   const [isRunning, setIsRunning] = useState(false)
   const [breakTime, setBreakTime] = useState(0)
   const [pauseStartTime, setPauseStartTime] = useState(null)
@@ -17,11 +18,16 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
 
   // Update remaining time and baseline when session changes
   useEffect(() => {
-    setRemaining(sessionDuration)
-    setBaselineSeconds(sessionDuration)
+    setRemaining(totalSessionDuration)
+    setBaselineSeconds(totalSessionDuration)
     setBreakTime(0) // Reset break time for new session
     hasCompletedRef.current = false
-  }, [sessionDuration])
+    
+    // Mark carryover as used when starting a new session
+    if (carryoverBreakTime > 0 && onCarryoverUsed) {
+      onCarryoverUsed()
+    }
+  }, [totalSessionDuration, carryoverBreakTime, onCarryoverUsed])
 
   // Reset completion guard when explicit session index changes
   useEffect(() => {
@@ -76,7 +82,7 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
             // Create session data
             const sessionData = {
               type: 'work', // All sessions are now work sessions
-              duration: sessionDuration,
+              duration: totalSessionDuration,
               breakTime: breakTime,
               completedAt: new Date().toISOString()
             }
@@ -147,8 +153,8 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
     // Clean up both timers
     cleanupTimerWorker()
     setIsRunning(false)
-    setRemaining(sessionDuration)
-    setBaselineSeconds(sessionDuration)
+    setRemaining(totalSessionDuration)
+    setBaselineSeconds(totalSessionDuration)
     setBreakTime(0)
     setPauseStartTime(null)
     
@@ -160,7 +166,7 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
     }
   }
 
-  const progressBase = baselineSeconds > 0 ? baselineSeconds : sessionDuration
+  const progressBase = baselineSeconds > 0 ? baselineSeconds : totalSessionDuration
   const progress = Math.min(100, Math.max(0, ((progressBase - remaining) / progressBase) * 100))
 
   // When user manually sets time (via editor or quick adjust), also update baseline
@@ -206,6 +212,7 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
     isRunning,
     progress,
     breakTime,
+    carryoverBreakTime,
     startTimer,
     pauseTimer,
     resetTimer,

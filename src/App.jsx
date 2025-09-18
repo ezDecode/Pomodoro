@@ -9,6 +9,7 @@ function App() {
   const [showPresetModal, setShowPresetModal] = useState(false)
   const [showCompletionModal, setShowCompletionModal] = useState(false)
   const [completedSessionData, setCompletedSessionData] = useState(null)
+  const [carryoverBreakTime, setCarryoverBreakTime] = useState(0)
 
   const { 
     settings, 
@@ -21,28 +22,42 @@ function App() {
   } = useSettings()
 
   const handleSessionComplete = useCallback((sessionData, autoStartNext, delayNext) => {
+    // Capture statistics BEFORE updating them for accurate "previous session" display
+    const previousStats = {
+      completedSessions: settings.completedSessions,
+      pauseCount: settings.pauseCount,
+      totalBreakTime: settings.totalBreakTime
+    }
+    
     addSessionToHistory(sessionData)
-    setCompletedSessionData(sessionData)
+    setCompletedSessionData({
+      ...sessionData,
+      previousStats // Include previous stats with session data
+    })
     setShowCompletionModal(true)
+    
+    // Set the break time from this session as carryover for next session
+    setCarryoverBreakTime(sessionData.breakTime)
     
     if (autoStartNext) {
       setTimeout(() => {
         setSessionIndex((i) => i + 1)
       }, Math.max(0, delayNext) * 1000)
     }
-  }, [addSessionToHistory])
+  }, [addSessionToHistory, settings.completedSessions, settings.pauseCount, settings.totalBreakTime])
 
   const { 
     remaining, 
     isRunning, 
     progress,
     breakTime,
+    carryoverBreakTime: currentCarryover,
     startTimer, 
     pauseTimer, 
     resetTimer,
     setRemaining,
     setRemainingManual
-  } = useTimer(sessionIndex, settings, handleSessionComplete)
+  } = useTimer(sessionIndex, settings, handleSessionComplete, carryoverBreakTime, handleCarryoverUsed)
 
   const handleTimeUpdate = useCallback((newTime, shouldPause = true) => {
     // Only pause if explicitly requested (default behavior for manual edits)
@@ -83,6 +98,10 @@ function App() {
     setCompletedSessionData(null)
   }
 
+  const handleCarryoverUsed = useCallback(() => {
+    setCarryoverBreakTime(0)
+  }, [])
+
   return (
     <div className="min-h-screen w-full bg-white relative text-gray-800 p-4">
       {/* Crosshatch Art - Light Pattern */}
@@ -106,23 +125,38 @@ function App() {
         />
 
         <div className={`grid grid-cols-1 gap-8 ${showStats ? 'lg:grid-cols-2' : ''}`}>
-          <Timer
-            sessionIndex={sessionIndex}
-            remaining={remaining}
-            isRunning={isRunning}
-            progress={progress}
-            breakTime={breakTime}
-            settings={settings}
-            customPresets={customPresets}
-            onStart={startTimer}
-            onPause={handlePause}
-            onReset={resetTimer}
-            onSkip={handleSkip}
-            onPresetSelect={updatePreset}
-            onAddCustomPreset={handleAddCustomPreset}
-            onTimeUpdate={handleTimeUpdate}
-            onSettingsUpdate={updateSettings}
-          />
+          <div className="space-y-8">
+            <Timer
+              sessionIndex={sessionIndex}
+              remaining={remaining}
+              isRunning={isRunning}
+              progress={progress}
+              breakTime={breakTime}
+              carryoverBreakTime={currentCarryover}
+              settings={settings}
+              customPresets={customPresets}
+              onStart={startTimer}
+              onPause={handlePause}
+              onReset={resetTimer}
+              onSkip={handleSkip}
+              onPresetSelect={updatePreset}
+              onAddCustomPreset={handleAddCustomPreset}
+              onTimeUpdate={handleTimeUpdate}
+              onSettingsUpdate={updateSettings}
+            />
+
+            {/* Session Completion Modal - Now Inline */}
+            <CompletionModal
+              isOpen={showCompletionModal}
+              onClose={handleCloseCompletionModal}
+              sessionData={completedSessionData}
+              totalStats={completedSessionData?.previousStats || {
+                completedSessions: settings.completedSessions,
+                pauseCount: settings.pauseCount,
+                totalBreakTime: settings.totalBreakTime
+              }}
+            />
+          </div>
 
           {showStats && (
             <Statistics settings={settings} />
@@ -138,17 +172,6 @@ function App() {
         customPresets={customPresets}
       />
 
-      {/* Session Completion Modal */}
-      <CompletionModal
-        isOpen={showCompletionModal}
-        onClose={handleCloseCompletionModal}
-        sessionData={completedSessionData}
-        totalStats={{
-          completedSessions: settings.completedSessions,
-          pauseCount: settings.pauseCount,
-          totalBreakTime: settings.totalBreakTime
-        }}
-      />
     </div>
   )
 }
