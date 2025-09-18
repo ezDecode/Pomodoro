@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Download, Upload, Plus, Minus, ChevronDown, ChevronUp } from 'lucide-react'
-// import { Download, Upload, ChevronDown, ChevronUp } from 'lucide-react'
 import { exportSettings, importSettings, formatTime } from '../utils/helpers'
 
 export function Settings({ 
