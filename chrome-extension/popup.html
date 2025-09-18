@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pomodoro Timer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">🍅 Pomodoro Timer</h1>
+      <div class="session-info">
+        <span class="session-label">Session</span>
+        <span class="session-count" id="sessionCount">1</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Timer Display -->
+      <div class="timer-display">
+        <div class="time-circle">
+          <div class="progress-ring">
+            <svg class="progress-svg" width="200" height="200">
+              <circle cx="100" cy="100" r="90" class="progress-track"></circle>
+              <circle cx="100" cy="100" r="90" class="progress-bar" id="progressCircle"></circle>
+            </svg>
+            <div class="time-text" id="timeDisplay">25:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timer Type -->
+      <div class="timer-type">
+        <span class="type-label" id="timerType">Focus Time</span>
+        <div class="phase-indicator">
+          <div class="phase-dot active" id="phaseDot"></div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls">
+        <button class="btn btn-primary" id="startPauseBtn">
+          <span class="btn-text">Start</span>
+        </button>
+        <button class="btn btn-secondary" id="resetBtn">
+          <span class="btn-text">Reset</span>
+        </button>
+        <button class="btn btn-secondary" id="skipBtn">
+          <span class="btn-text">Skip</span>
+        </button>
+      </div>
+
+      <!-- Settings -->
+      <div class="settings">
+        <div class="setting-row">
+          <label class="setting-label">Focus Time</label>
+          <div class="setting-input">
+            <button class="time-btn" id="focusDecrease">-</button>
+            <span class="time-value" id="focusTime">25</span>
+            <button class="time-btn" id="focusIncrease">+</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <label class="setting-label">Break Time</label>
+          <div class="setting-input">
+            <button class="time-btn" id="breakDecrease">-</button>
+            <span class="time-value" id="breakTime">5</span>
+            <button class="time-btn" id="breakIncrease">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics -->
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-label">Today</span>
+          <span class="stat-value" id="todayCount">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total</span>
+          <span class="stat-value" id="totalCount">0</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
