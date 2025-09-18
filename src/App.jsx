@@ -44,20 +44,25 @@ function App() {
     setRemainingManual
   } = useTimer(sessionIndex, settings, handleSessionComplete)
 
-  const handleTimeUpdate = useCallback((newTime) => {
-    pauseTimer()
+  const handleTimeUpdate = useCallback((newTime, shouldPause = true) => {
+    // Only pause if explicitly requested (default behavior for manual edits)
+    // Quick adjustments can choose not to pause
+    if (shouldPause && isRunning) {
+      pauseTimer()
+      incrementPauseCount()
+    }
     setRemainingManual(newTime)
-  }, [pauseTimer, setRemainingManual])
+  }, [pauseTimer, incrementPauseCount, setRemainingManual, isRunning])
 
   const handlePause = useCallback(() => {
     pauseTimer()
     incrementPauseCount()
   }, [pauseTimer, incrementPauseCount])
 
-  const handleSkip = () => {
+  const handleSkip = useCallback(() => {
     setSessionIndex((i) => i + 1)
     pauseTimer()
-  }
+  }, [pauseTimer])
 
   const handleToggleStats = () => {
     setShowStats((prev) => !prev)
@@ -106,6 +111,7 @@ function App() {
             remaining={remaining}
             isRunning={isRunning}
             progress={progress}
+            breakTime={breakTime}
             settings={settings}
             customPresets={customPresets}
             onStart={startTimer}

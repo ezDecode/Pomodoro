@@ -25,3 +25,11 @@ export const PRESETS = [
 ]
 
 export const STORAGE_KEY = 'timer-Settings'
+
+// Timer limits for robust time handling
+export const TIME_LIMITS = {
+  MIN_SECONDS: 1,                    // 1 second minimum
+  MAX_SECONDS: 8 * 60 * 60,          // 8 hours maximum  
+  MAX_HOURS: 8,                      // 8 hours maximum
+  MAX_MINUTES: 480,                  // 8 hours worth of minutes
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { playNotificationBeep, getSessionInfo } from '../utils/helpers'
+import { TIME_LIMITS } from '../utils/constants'
 
 export function useTimer(sessionIndex, settings, onSessionComplete) {
   const { preset, autoStartNext, delayNext } = settings
@@ -128,9 +129,37 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
 
   // When user manually sets time (via editor or quick adjust), also update baseline
   const setRemainingManual = (seconds) => {
-    const safe = Math.max(0, Number(seconds) || 0)
-    setRemaining(safe)
-    setBaselineSeconds(safe || sessionDuration)
+    const inputSeconds = Number(seconds)
+    
+    // Validate input
+    if (isNaN(inputSeconds) || inputSeconds < 0) {
+      console.warn('Invalid time input:', seconds)
+      return
+    }
+    
+    // Use consistent time limits
+    const { MIN_SECONDS: minTime, MAX_SECONDS: maxTime } = TIME_LIMITS
+    const safeTime = Math.min(maxTime, Math.max(minTime, inputSeconds))
+    
+    // Update remaining time
+    setRemaining(safeTime)
+    
+    // Update baseline for progress calculation
+    // If we're adjusting during session, use the adjusted time as new baseline
+    setBaselineSeconds(safeTime)
+    
+    // Reset break time when manually adjusting time (fresh start)
+    if (safeTime !== remaining) {
+      setBreakTime(0)
+      setPauseStartTime(null)
+      
+      // Stop break timer if running
+      if (breakTimerRef.current) {
+        breakTimerRef.current.postMessage('stop')
+        breakTimerRef.current.terminate()
+        breakTimerRef.current = null
+      }
+    }
   }
 
   return {

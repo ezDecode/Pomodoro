@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Plus, Minus } from 'lucide-react'
 import { formatTime, calculateTotalCycleSeconds, getSessionInfo, validateTimeInput } from '../utils/helpers'
+import { TIME_LIMITS } from '../utils/constants'
 import { ProgressBar } from './ProgressBar'
 import { TimerControls } from './TimerControls'
 import { PresetButtons } from './PresetButtons'
@@ -10,6 +11,7 @@ export function Timer({
   remaining,
   isRunning,
   progress,
+  breakTime = 0,
   settings,
   customPresets = [],
   onStart,
@@ -27,6 +29,7 @@ export function Timer({
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
   const [validationError, setValidationError] = useState('')
+  const [adjustmentFeedback, setAdjustmentFeedback] = useState('')
 
   const handleTimerClick = () => {
     if (!isRunning) {
@@ -76,8 +79,33 @@ export function Timer({
 
   const handleQuickAdjust = (seconds) => {
     if (!isRunning) {
-      const newTime = Math.max(0, remaining + seconds)
-      onTimeUpdate(newTime)
+      const currentTime = remaining
+      const newTime = currentTime + seconds
+      
+      // Use consistent time limits
+      const { MIN_SECONDS: minTime, MAX_SECONDS: maxTime, MAX_HOURS } = TIME_LIMITS
+      
+      let feedbackMessage = ''
+      
+      if (newTime < minTime) {
+        // If trying to go below minimum, set to minimum
+        onTimeUpdate(minTime, false) // Don't pause for quick adjustments
+        feedbackMessage = 'Minimum time reached (1 second)'
+      } else if (newTime > maxTime) {
+        // If trying to go above maximum, set to maximum  
+        onTimeUpdate(maxTime, false) // Don't pause for quick adjustments
+        feedbackMessage = `Maximum time reached (${MAX_HOURS} hours)`
+      } else {
+        // Normal adjustment
+        onTimeUpdate(newTime, false) // Don't pause for quick adjustments
+        feedbackMessage = ''
+      }
+      
+      // Show feedback and clear it after 2 seconds
+      setAdjustmentFeedback(feedbackMessage)
+      if (feedbackMessage) {
+        setTimeout(() => setAdjustmentFeedback(''), 2000)
+      }
     }
   }
 
@@ -118,51 +146,67 @@ export function Timer({
           
           {/* Quick Time Adjustment Buttons */}
           {!isRunning && !isEditing && (
-            <div className="flex justify-center gap-2 mb-4">
-              <button
-                onClick={() => handleQuickAdjust(-60)}
-                className="btn-brutal btn-neutral btn-icon-only"
-                title="Remove 1 minute"
-              >
-                <Minus size={16} />
-              </button>
-              <button
-                onClick={() => handleQuickAdjust(-300)}
-                className="btn-brutal btn-neutral btn-icon-only"
-                title="Remove 5 minutes"
-              >
-                <Minus size={16} />
-                <span className="text-xs ml-1">5</span>
-              </button>
-              <button
-                onClick={() => handleQuickAdjust(300)}
-                className="btn-brutal btn-neutral btn-icon-only"
-                title="Add 5 minutes"
-              >
-                <Plus size={16} />
-                <span className="text-xs ml-1">5</span>
-              </button>
-              <button
-                onClick={() => handleQuickAdjust(60)}
-                className="btn-brutal btn-neutral btn-icon-only"
-                title="Add 1 minute"
-              >
-                <Plus size={16} />
-              </button>
+            <div className="space-y-2 mb-4">
+              <div className="flex justify-center gap-2">
+                <button
+                  onClick={() => handleQuickAdjust(-60)}
+                  className="btn-brutal btn-neutral btn-icon-only"
+                  title="Remove 1 minute"
+                >
+                  <Minus size={16} />
+                </button>
+                <button
+                  onClick={() => handleQuickAdjust(-300)}
+                  className="btn-brutal btn-neutral btn-icon-only"
+                  title="Remove 5 minutes"
+                >
+                  <Minus size={16} />
+                  <span className="text-xs ml-1">5</span>
+                </button>
+                <button
+                  onClick={() => handleQuickAdjust(300)}
+                  className="btn-brutal btn-neutral btn-icon-only"
+                  title="Add 5 minutes"
+                >
+                  <Plus size={16} />
+                  <span className="text-xs ml-1">5</span>
+                </button>
+                <button
+                  onClick={() => handleQuickAdjust(60)}
+                  className="btn-brutal btn-neutral btn-icon-only"
+                  title="Add 1 minute"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+              {adjustmentFeedback && (
+                <div className="text-sm text-orange-600 font-medium">
+                  {adjustmentFeedback}
+                </div>
+              )}
             </div>
           )}
           
-          <div className="text-base sm:text-lg font-normal flex items-center justify-center gap-6">
-            <span>Cycle total: {formatTime(totalCycleSeconds)}</span>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={settings.autoStartNext} 
-                onChange={(e) => onSettingsUpdate({ autoStartNext: e.target.checked })}
-                className="w-4 h-4"
-              />
-              <span>Auto-start next</span>
-            </label>
+          <div className="text-base sm:text-lg font-normal space-y-3">
+            <div className="flex items-center justify-center gap-6">
+              <span>Cycle total: {formatTime(totalCycleSeconds)}</span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={settings.autoStartNext} 
+                  onChange={(e) => onSettingsUpdate({ autoStartNext: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                <span>Auto-start next</span>
+              </label>
+            </div>
+            {!isRunning && breakTime > 0 && (
+              <div className="text-center">
+                <div className="text-sm text-orange-600">
+                  Break time this session: <span className="font-medium">{formatTime(breakTime)}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -70,28 +70,54 @@ export function validateTimeInput(input) {
   const trimmed = input.trim()
   if (!trimmed) return { isValid: false, error: 'Empty input' }
   
-  const parts = trimmed.split(':').map(Number)
+  // Remove any non-digit, non-colon characters and handle common input mistakes
+  const cleaned = trimmed.replace(/[^\d:]/g, '')
+  if (!cleaned) return { isValid: false, error: 'No valid numbers found' }
   
+  const parts = cleaned.split(':').map(part => {
+    const num = parseInt(part, 10)
+    return isNaN(num) ? 0 : num
+  }).filter((_, index, arr) => index === 0 || arr[index - 1] !== undefined)
+  
+  // Handle empty parts after colon
   if (parts.some(isNaN)) return { isValid: false, error: 'Invalid number format' }
+  
+  // Use consistent time limits (imported at top of function to avoid circular imports)
+  const maxHours = 8
+  const maxMinutes = 480 // 8 hours worth of minutes  
+  const maxSeconds = 28800 // 8 hours worth of seconds
   
   if (parts.length === 3) {
     const [hours, minutes, seconds] = parts
     if (hours < 0 || minutes < 0 || seconds < 0) return { isValid: false, error: 'Negative values not allowed' }
     if (minutes >= 60 || seconds >= 60) return { isValid: false, error: 'Minutes/seconds must be less than 60' }
-    if (hours > 23) return { isValid: false, error: 'Hours must be less than 24' }
-    return { isValid: true, seconds: hours * 3600 + minutes * 60 + seconds }
+    if (hours > maxHours) return { isValid: false, error: `Hours must be less than ${maxHours + 1}` }
+    
+    const totalSeconds = hours * 3600 + minutes * 60 + seconds
+    if (totalSeconds === 0) return { isValid: false, error: 'Time cannot be zero' }
+    if (totalSeconds > maxSeconds) return { isValid: false, error: `Total time cannot exceed ${maxHours} hours` }
+    
+    return { isValid: true, seconds: totalSeconds }
   } else if (parts.length === 2) {
     const [minutes, seconds] = parts
     if (minutes < 0 || seconds < 0) return { isValid: false, error: 'Negative values not allowed' }
     if (seconds >= 60) return { isValid: false, error: 'Seconds must be less than 60' }
-    if (minutes > 999) return { isValid: false, error: 'Minutes must be less than 1000' }
-    return { isValid: true, seconds: minutes * 60 + seconds }
+    if (minutes > maxMinutes) return { isValid: false, error: `Minutes must be less than ${maxMinutes + 1}` }
+    
+    const totalSeconds = minutes * 60 + seconds
+    if (totalSeconds === 0) return { isValid: false, error: 'Time cannot be zero' }
+    
+    return { isValid: true, seconds: totalSeconds }
   } else if (parts.length === 1) {
     const value = parts[0]
     if (value < 0) return { isValid: false, error: 'Negative values not allowed' }
-    if (value > 999) return { isValid: false, error: 'Value must be less than 1000' }
+    if (value === 0) return { isValid: false, error: 'Time cannot be zero' }
+    if (value > maxMinutes) return { isValid: false, error: `Value must be less than ${maxMinutes + 1}` }
     
-    const seconds = value < 60 ? value * 60 : value
+    // Interpret single numbers as minutes if under 60, otherwise as seconds
+    const seconds = value <= 60 ? value * 60 : value
+    if (seconds > maxSeconds) return { isValid: false, error: `Total time cannot exceed ${maxHours} hours` }
+    
     return { isValid: true, seconds }
   }
   
