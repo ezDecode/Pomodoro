@@ -1,8 +1,10 @@
-import { BarChart3 } from 'lucide-react'
+import { BarChart3, Bookmark, Settings } from 'lucide-react'
 
 export function Header({ 
   showStats, 
-  onToggleStats
+  onToggleStats,
+  onTogglePresets,
+  onToggleSettings
 }) {
   return (
     <div className="flex items-center justify-between mb-8">
@@ -11,6 +13,22 @@ export function Header({
         <p className="text-base sm:text-lg md:text-xl font-normal">Ultra-flexible timer</p>
       </div>
       <div className="flex gap-4">
+        <button 
+          className="btn-brutal btn-primary flex items-center gap-2 sm:gap-2 btn-icon-only"
+          onClick={onTogglePresets}
+          title="Presets"
+        >
+          <Bookmark size={20} />
+          <span className="hide-text-mobile">Presets</span>
+        </button>
+        <button 
+          className="btn-brutal btn-secondary flex items-center gap-2 sm:gap-2 btn-icon-only"
+          onClick={onToggleSettings}
+          title="Settings"
+        >
+          <Settings size={20} />
+          <span className="hide-text-mobile">Settings</span>
+        </button>
         <button 
           className="btn-brutal btn-secondary flex items-center gap-2 sm:gap-2 btn-icon-only"
           onClick={onToggleStats}

@@ -7,10 +7,20 @@ export function useSettings() {
     return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS
   })
 
+  const [customPresets, setCustomPresets] = useState(() => {
+    const saved = localStorage.getItem('pomodoro-custom-presets')
+    return saved ? JSON.parse(saved) : []
+  })
+
   // Save settings to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
   }, [settings])
+
+  // Save custom presets to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('pomodoro-custom-presets', JSON.stringify(customPresets))
+  }, [customPresets])
 
   const updateSettings = (updates) => {
     setSettings(prev => ({ ...prev, ...updates }))
@@ -38,11 +48,34 @@ export function useSettings() {
     setSettings(prev => ({ ...prev, ...importedSettings }))
   }
 
+  const saveCustomPreset = (preset, deleteName = null) => {
+    if (deleteName) {
+      // Delete preset
+      setCustomPresets(prev => prev.filter(p => p.name !== deleteName))
+    } else if (preset) {
+      // Add or update preset
+      setCustomPresets(prev => {
+        const existingIndex = prev.findIndex(p => p.name === preset.name)
+        if (existingIndex >= 0) {
+          // Update existing
+          const updated = [...prev]
+          updated[existingIndex] = preset
+          return updated
+        } else {
+          // Add new
+          return [...prev, preset]
+        }
+      })
+    }
+  }
+
   return {
     settings,
+    customPresets,
     updateSettings,
     updatePreset,
     addSessionToHistory,
-    importSettings
+    importSettings,
+    saveCustomPreset
   }
 }

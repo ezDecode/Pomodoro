@@ -1,18 +1,22 @@
 import { useState, useCallback } from 'react'
-import { Header, Timer, Settings, Statistics } from './components'
+import { Header, Timer, Settings, Statistics, CustomPresetModal } from './components'
 import { useSettings } from './hooks/useSettings'
 import { useTimer } from './hooks/useTimer'
 
 function App() {
   const [sessionIndex, setSessionIndex] = useState(0)
   const [showStats, setShowStats] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showPresetModal, setShowPresetModal] = useState(false)
 
   const { 
     settings, 
+    customPresets,
     updateSettings, 
     updatePreset, 
     addSessionToHistory, 
-    importSettings 
+    importSettings,
+    saveCustomPreset
   } = useSettings()
 
   const handleSessionComplete = useCallback((sessionData, autoStartNext, delayNext) => {
@@ -31,8 +35,14 @@ function App() {
     progress, 
     startTimer, 
     pauseTimer, 
-    resetTimer 
+    resetTimer,
+    setRemaining
   } = useTimer(sessionIndex, settings, handleSessionComplete)
+
+  const handleTimeUpdate = useCallback((newTime) => {
+    pauseTimer()
+    setRemaining(newTime)
+  }, [pauseTimer, setRemaining])
 
   const handleSkip = () => {
     setSessionIndex((i) => i + 1)
@@ -43,6 +53,21 @@ function App() {
     setShowStats((prev) => !prev)
   }
 
+  const handleToggleSettings = () => {
+    setShowSettings((prev) => !prev)
+  }
+
+  const handleTogglePresets = () => {
+    setShowPresetModal((prev) => !prev)
+  }
+
+  const handleAddCustomPreset = () => {
+    setShowPresetModal(true)
+  }
+
+  const handleSaveCustomPreset = (preset, deleteName) => {
+    saveCustomPreset(preset, deleteName)
+  }
 
   return (
     <div className="min-h-screen w-full bg-white relative text-gray-800 p-4">
@@ -64,29 +89,48 @@ function App() {
         <Header
           showStats={showStats}
           onToggleStats={handleToggleStats}
+          onToggleSettings={handleToggleSettings}
+          onTogglePresets={handleTogglePresets}
         />
 
-        <div className={`grid grid-cols-1 gap-8 ${showStats ? 'lg:grid-cols-2' : ''}`}>
+        <div className={`grid grid-cols-1 gap-8 ${showStats || showSettings ? 'lg:grid-cols-2' : ''}`}>
           <Timer
             sessionIndex={sessionIndex}
             remaining={remaining}
             isRunning={isRunning}
             progress={progress}
             settings={settings}
+            customPresets={customPresets}
             onStart={startTimer}
             onPause={pauseTimer}
             onReset={resetTimer}
             onSkip={handleSkip}
             onPresetSelect={updatePreset}
-            onSettingsUpdate={updateSettings}
-            onImportSettings={importSettings}
+            onAddCustomPreset={handleAddCustomPreset}
+            onTimeUpdate={handleTimeUpdate}
           />
+
+          {showSettings && (
+            <Settings
+              settings={settings}
+              onSettingsUpdate={updateSettings}
+              onImportSettings={importSettings}
+            />
+          )}
 
           {showStats && (
             <Statistics settings={settings} />
           )}
         </div>
       </div>
+
+      {/* Custom Preset Modal */}
+      <CustomPresetModal
+        isOpen={showPresetModal}
+        onClose={() => setShowPresetModal(false)}
+        onSave={handleSaveCustomPreset}
+        customPresets={customPresets}
+      />
     </div>
   )
 }

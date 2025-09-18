@@ -85,6 +85,7 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
     progress,
     startTimer,
     pauseTimer,
-    resetTimer
+    resetTimer,
+    setRemaining
   }
 }
