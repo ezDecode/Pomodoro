@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { playNotificationBeep, getSessionInfo } from '../utils/helpers'
 
 export function useTimer(sessionIndex, settings, onSessionComplete) {
-  const { preset, autoStartNext, delayNext, volume } = settings
+  const { preset, autoStartNext, delayNext } = settings
   const { sessionDuration, isWork } = getSessionInfo(sessionIndex, preset)
   
   const [remaining, setRemaining] = useState(sessionDuration)
@@ -37,7 +37,7 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
           timerRef.current = null
           
           // Play notification beep
-          playNotificationBeep(volume)
+          playNotificationBeep()
 
           // Create session data
           const sessionData = {
@@ -63,7 +63,7 @@ export function useTimer(sessionIndex, settings, onSessionComplete) {
       timerRef.current?.terminate()
       timerRef.current = null
     }
-  }, [isRunning, autoStartNext, delayNext, volume, sessionDuration, isWork, onSessionComplete])
+  }, [isRunning, autoStartNext, delayNext, sessionDuration, isWork, onSessionComplete])
 
   const startTimer = () => setIsRunning(true)
   const pauseTimer = () => setIsRunning(false)

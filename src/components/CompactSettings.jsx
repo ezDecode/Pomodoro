@@ -8,7 +8,7 @@ export function CompactSettings({
   onImportSettings 
 }) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const { preset, autoStartNext, delayNext, volume } = settings
+  const { preset, autoStartNext, delayNext } = settings
 
   const handleImportSettings = (event) => {
     importSettings(event, onImportSettings)
@@ -122,25 +122,6 @@ export function CompactSettings({
             </div>
           </div>
 
-          {/* Audio Settings */}
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Audio</h3>
-            <label className="flex items-center justify-between gap-4">
-              <span className="text-sm text-gray-600">Volume</span>
-              <div className="flex items-center gap-2 flex-1 max-w-32">
-                <input 
-                  className="flex-1" 
-                  type="range" 
-                  min={0} 
-                  max={1} 
-                  step={0.01} 
-                  value={volume} 
-                  onChange={(e) => onSettingsUpdate({ volume: Number(e.target.value) })} 
-                />
-                <span className="text-xs text-gray-500 w-8">{Math.round(volume * 100)}%</span>
-              </div>
-            </label>
-          </div>
 
           {/* Import/Export */}
           <div>

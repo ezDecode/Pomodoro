@@ -6,14 +6,14 @@ export function formatTime(totalSeconds) {
   return `${hh}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
 
-export function playNotificationBeep(volume) {
+export function playNotificationBeep() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)()
     const o = ctx.createOscillator()
     const g = ctx.createGain()
     o.type = 'square'
     o.frequency.value = 880
-    g.gain.value = volume
+    g.gain.value = 1.0 // Use system volume (max volume, system will control)
     o.connect(g)
     g.connect(ctx.destination)
     o.start()
@@ -61,43 +61,6 @@ export function importSettings(event, onSettingsImport) {
   }
 }
 
-export function parseTimeInput(input) {
-  if (!input || typeof input !== 'string') return null
-  
-  const trimmed = input.trim()
-  if (!trimmed) return null
-  
-  // Handle different time formats
-  const parts = trimmed.split(':').map(Number)
-  
-  // Check if all parts are valid numbers
-  if (parts.some(isNaN)) return null
-  
-  if (parts.length === 3) {
-    // HH:MM:SS format
-    const [hours, minutes, seconds] = parts
-    if (hours < 0 || minutes < 0 || seconds < 0 || minutes >= 60 || seconds >= 60) return null
-    return hours * 3600 + minutes * 60 + seconds
-  } else if (parts.length === 2) {
-    // MM:SS format
-    const [minutes, seconds] = parts
-    if (minutes < 0 || seconds < 0 || seconds >= 60) return null
-    return minutes * 60 + seconds
-  } else if (parts.length === 1) {
-    const value = parts[0]
-    if (value < 0) return null
-    
-    // If it's a small number (less than 60), treat as minutes
-    // If it's larger, treat as seconds
-    if (value < 60) {
-      return value * 60 // minutes
-    } else {
-      return value // seconds
-    }
-  }
-  
-  return null // Invalid format
-}
 
 export function validateTimeInput(input) {
   if (!input || typeof input !== 'string') return { isValid: false, error: 'Invalid input' }

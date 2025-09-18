@@ -15,7 +15,6 @@ function App() {
     updateSettings, 
     updatePreset, 
     addSessionToHistory, 
-    importSettings,
     saveCustomPreset
   } = useSettings()
 
@@ -120,7 +119,6 @@ function App() {
             <Settings
               settings={settings}
               onSettingsUpdate={updateSettings}
-              onImportSettings={importSettings}
             />
           )}
 

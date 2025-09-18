@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Plus, Minus } from 'lucide-react'
-import { formatTime, calculateTotalCycleSeconds, getSessionInfo, parseTimeInput, validateTimeInput } from '../utils/helpers'
+import { formatTime, calculateTotalCycleSeconds, getSessionInfo, validateTimeInput } from '../utils/helpers'
 import { ProgressBar } from './ProgressBar'
 import { TimerControls } from './TimerControls'
 import { PresetButtons } from './PresetButtons'
@@ -151,8 +151,9 @@ export function Timer({
             </div>
           )}
           
-          <div className="text-base sm:text-lg font-normal">
-            Cycle total: {formatTime(totalCycleSeconds)}
+          <div className="text-base sm:text-lg font-normal flex items-center justify-center gap-4">
+            <span>Cycle total: {formatTime(totalCycleSeconds)}</span>
+            {settings.autoStartNext && <span>Auto-start: On</span>}
           </div>
         </div>
 
