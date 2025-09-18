@@ -61,6 +61,12 @@ body {
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
 
+/* Destructive actions */
+.btn-danger {
+  @apply border-2 border-black bg-red-600 text-white font-normal;
+  box-shadow: 4px 4px 0px 0px rgb(0,0,0);
+}
+
 /* Neutral button used for secondary actions and icon-only controls */
 .btn-neutral {
   @apply border-2 border-black bg-gray-200 text-black font-normal;
@@ -126,7 +132,7 @@ body {
 
 /* Preset button styling for all screen sizes */
 .preset-compact {
-  @apply px-4 py-2 text-base min-w-max;
+  @apply px-3 py-2 text-base min-w-0;
 }
 
 @media (max-width: 640px) {

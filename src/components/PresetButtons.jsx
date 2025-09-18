@@ -23,7 +23,10 @@ export function PresetButtons({ onPresetSelect, onAddCustomPreset, customPresets
             <button 
               key={preset.name}
               className="btn-brutal btn-success preset-compact w-full"
-              onClick={() => onPresetSelect(preset)}
+              onClick={() => {
+                onPresetSelect(preset)
+                if (onAddCustomPreset) onAddCustomPreset()
+              }}
             >
               {preset.name}
             </button>
@@ -40,7 +43,10 @@ export function PresetButtons({ onPresetSelect, onAddCustomPreset, customPresets
               <button 
                 key={`custom-${preset.name}`}
                 className="btn-brutal btn-primary preset-compact w-full"
-                onClick={() => onPresetSelect(preset)}
+                onClick={() => {
+                  onPresetSelect(preset)
+                  if (onAddCustomPreset) onAddCustomPreset()
+                }}
               >
                 {preset.name}
               </button>
