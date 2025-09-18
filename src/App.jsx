@@ -102,13 +102,6 @@ function App() {
             onSettingsUpdate={updateSettings}
           />
 
-          {/* {showSettings && (
-            <Settings
-              settings={settings}
-              onSettingsUpdate={updateSettings}
-            />
-          )} */}
-
           {showStats && (
             <Statistics settings={settings} />
           )}
