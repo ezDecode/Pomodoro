@@ -170,7 +170,7 @@ export function useTimer(sessionIndex, settings, onSessionComplete, carryoverBre
   const progressBase = baselineSeconds > 0 ? baselineSeconds : totalSessionDuration
   const progress = Math.min(100, Math.max(0, ((progressBase - remaining) / progressBase) * 100))
 
-  // When user manually sets time (via editor or quick adjust), also update baseline
+  // When user manually sets time (via editor or quick adjust), preserve progress where possible
   const setRemainingManual = (seconds) => {
     const inputSeconds = Number(seconds)
     
@@ -187,17 +187,21 @@ export function useTimer(sessionIndex, settings, onSessionComplete, carryoverBre
     // Update remaining time
     setRemaining(safeTime)
     
-    // Update baseline for progress calculation
-    // If we're adjusting during session, use the adjusted time as new baseline
-    setBaselineSeconds(safeTime)
+    // Only update baseline if this is a major time change (like setting a completely new time)
+    // or if no progress has been made yet. This preserves progress during small adjustments.
+    const currentProgress = baselineSeconds > 0 ? ((baselineSeconds - remaining) / baselineSeconds) : 0
+    const timeChangeRatio = Math.abs(safeTime - remaining) / (remaining || 1)
     
-    // Reset break time when manually adjusting time (fresh start)
-    if (safeTime !== remaining) {
-      // Clean up any running timers to prevent conflicts
-      cleanupTimerWorker()
+    // If this is a major change (>50% of current time) or no progress made, reset baseline
+    if (currentProgress < 0.05 || timeChangeRatio > 0.5) {
+      setBaselineSeconds(safeTime)
       
+      // Reset break time when making major time adjustments (fresh start)
       setBreakTime(0)
       setPauseStartTime(null)
+      
+      // Clean up any running timers to prevent conflicts
+      cleanupTimerWorker()
       
       // Stop break timer if running
       if (breakTimerRef.current) {
@@ -206,6 +210,7 @@ export function useTimer(sessionIndex, settings, onSessionComplete, carryoverBre
         breakTimerRef.current = null
       }
     }
+    // For small adjustments, keep the original baseline to preserve progress
   }
 
   return {
