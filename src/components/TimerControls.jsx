@@ -8,14 +8,14 @@ export function TimerControls({
   onSkip 
 }) {
   return (
-    <div className="btn-group mb-8">
+    <div className="btn-group mb-11">
       {!isRunning ? (
         <button 
           className="btn-brutal btn-primary flex items-center gap-2 sm:gap-2 btn-icon-only"
           onClick={onStart}
           title="Start timer"
         >
-          <Play size={20} />
+          <Play size={24} />
           <span className="hide-text-mobile">Start</span>
         </button>
       ) : (
@@ -24,7 +24,7 @@ export function TimerControls({
           onClick={onPause}
           title="Pause timer"
         >
-          <Pause size={20} />
+          <Pause size={24} />
           <span className="hide-text-mobile">Pause</span>
         </button>
       )}
@@ -33,7 +33,7 @@ export function TimerControls({
         onClick={onReset}
         title="Reset timer"
       >
-        <RotateCcw size={20} />
+        <RotateCcw size={24} />
         <span className="hide-text-mobile">Reset</span>
       </button>
       <button 
@@ -41,7 +41,7 @@ export function TimerControls({
         onClick={onSkip}
         title="Skip to next session"
       >
-        <SkipForward size={20} />
+        <SkipForward size={24} />
         <span className="hide-text-mobile">Skip</span>
       </button>
     </div>

@@ -60,20 +60,20 @@ body {
 /* Neo-brutalist button styles */
 .btn-brutal {
   /* Neo-brutalist base: bold border, chunky offset shadow, slight motion */
-  @apply inline-flex items-center gap-2 border-2 border-black bg-white text-black font-normal px-6 py-3 text-lg select-none tracking-tight;
-  box-shadow: 4px 4px 0px 0px rgb(0,0,0);
+  @apply inline-flex items-center gap-3 border-2 border-black bg-white text-black font-normal px-8 py-4 text-xl select-none tracking-tight;
+  box-shadow: 5px 5px 0px 0px rgb(0,0,0);
   transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
-  min-height: 44px; /* Accessible hit target */
+  min-height: 56px; /* Accessible hit target */
 }
 
 .btn-brutal:hover {
   transform: translate(1px, 1px);
-  box-shadow: 3px 3px 0px 0px rgb(0,0,0);
+  box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
 
 .btn-brutal:active {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px 0px rgb(0,0,0);
+  box-shadow: 3px 3px 0px 0px rgb(0,0,0);
 }
 
 /* Keyboard focus visibility */
@@ -87,7 +87,7 @@ body {
 .btn-brutal[aria-disabled="true"] {
   @apply bg-gray-200 text-gray-500 border-gray-700 cursor-not-allowed;
   transform: none;
-  box-shadow: 4px 4px 0px 0px rgb(0,0,0);
+  box-shadow: 5px 5px 0px 0px rgb(0,0,0);
   opacity: 0.85;
 }
 
@@ -170,13 +170,13 @@ body {
 
 /* Icon-only buttons (square, centered) */
 .btn-icon-only { 
-  padding: 0.75rem; 
-  min-width: 3rem; 
+  padding: 1rem; 
+  min-width: 4rem; 
   justify-content: center; 
   align-items: center;
   display: inline-flex;
 }
-.btn-icon-only svg { width: 1rem; height: 1rem; }
+.btn-icon-only svg { width: 1.5rem; height: 1.5rem; }
 
 /* Neo-brutalist input styles */
 .input-brutal {
@@ -192,7 +192,7 @@ body {
 
 /* Neo-brutalist card styles */
 .card-brutal {
-  @apply border-2 border-black bg-white p-6 tracking-tight;
+  @apply border-2 border-black bg-white p-4 sm:p-6 tracking-tight;
   box-shadow: 4px 4px 0px 0px rgb(0,0,0);
 }
 
@@ -200,8 +200,10 @@ body {
 
 /* Neo-brutalist progress bar */
 .progress-brutal {
-  @apply border-2 border-black bg-gray-200 h-8 tracking-tight;
-  box-shadow: 2px 2px 0px 0px rgb(0,0,0);
+  @apply border-2 border-black bg-gray-200 h-11 tracking-tight;
+  box-shadow: 3px 3px 0px 0px rgb(0,0,0);
+  max-width: fit-content;
+  margin: 0 auto;
 }
 
 .progress-fill {
@@ -216,6 +218,8 @@ body {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+  max-width: fit-content;
+  margin: 0 auto;
 }
 
 .btn-group-compact {
@@ -224,6 +228,8 @@ body {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+  max-width: fit-content;
+  margin: 0 auto;
 }
 
 /* Modal animations */
@@ -255,10 +261,21 @@ body {
     overflow: hidden;
   }
   
+  .btn-brutal {
+    @apply px-4 py-3 text-lg;
+    min-height: 48px;
+    box-shadow: 4px 4px 0px 0px rgb(0,0,0);
+  }
+  
   .btn-icon-only {
     padding: 0.75rem;
     min-width: 3rem;
     justify-content: center;
+  }
+  
+  .btn-icon-only svg { 
+    width: 1.25rem; 
+    height: 1.25rem; 
   }
   
   .btn-icon-only .hide-text-mobile {
@@ -277,6 +294,43 @@ body {
   
   .btn-group-compact {
     gap: 0.25rem;
+  }
+  
+  .progress-brutal {
+    @apply h-8;
+    box-shadow: 2px 2px 0px 0px rgb(0,0,0);
+  }
+}
+
+/* Extra small screen adjustments */
+@media (max-width: 480px) {
+  .btn-brutal {
+    @apply px-3 py-2 text-base;
+    min-height: 44px;
+    box-shadow: 3px 3px 0px 0px rgb(0,0,0);
+  }
+  
+  .btn-icon-only {
+    padding: 0.625rem;
+    min-width: 2.75rem;
+  }
+  
+  .btn-icon-only svg { 
+    width: 1rem; 
+    height: 1rem; 
+  }
+  
+  .btn-group {
+    gap: 0.375rem;
+  }
+  
+  .btn-group-compact {
+    gap: 0.25rem;
+  }
+  
+  .progress-brutal {
+    @apply h-6;
+    box-shadow: 2px 2px 0px 0px rgb(0,0,0);
   }
 }
 

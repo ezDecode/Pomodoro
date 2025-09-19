@@ -126,10 +126,10 @@ export function Timer({
   return (
     <div className="lg:col-span-1">
       <div className="card-brutal text-center">
-        <div className="mb-8">
-          <div className="text-lg sm:text-xl font-normal mb-4 tracking-tight">{sessionLabel}</div>
+        <div className="mb-11">
+          <div className="text-lg sm:text-xl md:text-2xl font-normal mb-6 tracking-tight">{sessionLabel}</div>
           <div 
-            className="timer-display mb-4 text-6xl sm:text-7xl md:text-8xl font-light tracking-tight cursor-pointer hover:bg-gray-50 transition-colors rounded-lg p-2"
+            className="timer-display mb-6 text-6xl sm:text-8xl md:text-9xl lg:text-[11rem] font-light tracking-tight cursor-pointer hover:bg-gray-50 transition-colors rounded-lg p-3"
             onClick={handleTimerClick}
             title={!isRunning ? "Click to edit time" : "Stop timer to edit"}
           >
@@ -141,14 +141,14 @@ export function Timer({
                   onChange={handleTimeEdit}
                   onBlur={handleTimeSubmit}
                   onKeyDown={handleKeyPress}
-                  className={`bg-transparent border-none outline-none text-center w-full text-6xl sm:text-7xl md:text-8xl font-light tracking-tight ${
+                  className={`bg-transparent border-none outline-none text-center w-full text-6xl sm:text-8xl md:text-9xl lg:text-[11rem] font-light tracking-tight ${
                     validationError ? 'text-red-500' : ''
                   }`}
                   autoFocus
                   placeholder="MM:SS or HH:MM:SS"
                 />
                 {validationError && (
-                  <div className="text-sm text-red-500 mt-2">
+                  <div className="text-base text-red-500 mt-3">
                     {validationError}
                   </div>
                 )}
@@ -160,70 +160,70 @@ export function Timer({
           
           {/* Quick Time Adjustment Buttons - Hidden when timer is running */}
           {!isRunning && !isEditing && (
-            <div className="space-y-2 mb-4">
+            <div className="space-y-3 mb-6">
               <div className="btn-group-compact">
                 <button
                   onClick={() => handleQuickAdjust(-60)}
                   className="btn-brutal btn-neutral btn-icon-only"
                   title="Remove 1 minute"
                 >
-                  <Minus size={16} />
+                  <Minus size={20} />
                 </button>
                 <button
                   onClick={() => handleQuickAdjust(-300)}
                   className="btn-brutal btn-neutral btn-icon-only inline-flex items-center gap-1"
                   title="Remove 5 minutes"
                 >
-                  <Minus size={16} />
-                  <span className="text-xs">5</span>
+                  <Minus size={20} />
+                  <span className="text-sm">5</span>
                 </button>
                 <button
                   onClick={() => handleQuickAdjust(300)}
                   className="btn-brutal btn-neutral btn-icon-only inline-flex items-center gap-1"
                   title="Add 5 minutes"
                 >
-                  <Plus size={16} />
-                  <span className="text-xs">5</span>
+                  <Plus size={20} />
+                  <span className="text-sm">5</span>
                 </button>
                 <button
                   onClick={() => handleQuickAdjust(60)}
                   className="btn-brutal btn-neutral btn-icon-only"
                   title="Add 1 minute"
                 >
-                  <Plus size={16} />
+                  <Plus size={20} />
                 </button>
               </div>
               {adjustmentFeedback && (
-                <div className="text-sm text-orange-600 font-normal">
+                <div className="text-base text-orange-600 font-normal">
                   {adjustmentFeedback}
                 </div>
               )}
             </div>
           )}
           
-          <div className="text-base sm:text-lg font-normal space-y-3 tracking-tight">
-            <div className="flex items-center justify-center gap-6">
+          <div className="text-base sm:text-lg md:text-xl font-normal space-y-4 tracking-tight">
+            <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-8 flex-wrap">
               <span>Cycle total: {formatTime(totalCycleSeconds)}</span>
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex items-center gap-3 cursor-pointer">
                 <input 
                   type="checkbox" 
                   checked={settings.autoStartNext} 
                   onChange={(e) => onSettingsUpdate({ autoStartNext: e.target.checked })}
-                  className="w-4 h-4"
+                  className="w-5 h-5"
                 />
                 <span>Auto-start next</span>
               </label>
             </div>
             {!isRunning && breakTime > 0 && (
               <div className="text-center">
-                <div className="text-sm text-orange-600 tracking-tight">
+                <div className="text-base text-orange-600 tracking-tight">
                   Break time this session: <span className="font-normal">{formatTime(breakTime)}</span>
                 </div>
               </div>
             )}
             {carryoverBreakTime > 0 && (
               <div className="text-center">
-                <div className="text-sm text-purple-600 tracking-tight">
+                <div className="text-base text-purple-600 tracking-tight">
                   + Carryover from previous session: <span className="font-normal">{formatTime(carryoverBreakTime)}</span>
                 </div>
               </div>
